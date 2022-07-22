@@ -15,12 +15,13 @@ class FormFieldController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         \Gate::authorize('usable', 'formfield.list');
-        $fields = GenericFormField::paginate();
+        $fields = GenericFormField::paginate($request->get('limit', 30));
 
         return (new FormFieldCollection($fields))->additional([
             'message' => HttpStatus::message(HttpStatus::OK),
@@ -32,12 +33,13 @@ class FormFieldController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function form($id)
+    public function form(Request $request, $id)
     {
         \Gate::authorize('usable', 'formfield.list');
-        $fields = Form::find($id)->fields()->paginate();
+        $fields = Form::find($id)->fields()->paginate($request->get('limit', 30));
 
         return (new FormFieldCollection($fields))->additional([
             'message' => HttpStatus::message(HttpStatus::OK),

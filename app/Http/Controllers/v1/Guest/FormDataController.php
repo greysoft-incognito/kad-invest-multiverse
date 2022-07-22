@@ -17,11 +17,12 @@ class FormDataController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function index($id)
+    public function index(Request $request, $id)
     {
-        $forms = Form::find($id)->data()->paginate();
+        $forms = Form::find($id)->data()->paginate($request->get('limit', 30));
 
         return (new FormDataCollection($forms))->additional([
             'message' => HttpStatus::message(HttpStatus::OK),
@@ -33,11 +34,12 @@ class FormDataController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function all()
+    public function all(Request $request)
     {
-        $forms = GenericFormData::paginate();
+        $forms = GenericFormData::paginate($request->get('limit', 30));
 
         return (new FormDataCollection($forms))->additional([
             'message' => HttpStatus::message(HttpStatus::OK),

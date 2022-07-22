@@ -14,12 +14,13 @@ class FormController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         \Gate::authorize('usable', 'form.list');
-        $forms = Form::paginate();
+        $forms = Form::paginate($request->get('limit', 30));
 
         return (new FormCollection($forms))->additional([
             'message' => HttpStatus::message(HttpStatus::OK),
