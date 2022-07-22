@@ -4,4 +4,4 @@ The **GreyMultiverse** is a collection of different API endpoints intended to se
 
 ### API Documentation
 
-The API Documentation can be accessed from (https://documenter.getpostman.com/view/19266444/UzXKVdhN)[https://documenter.getpostman.com/view/19266444/UzXKVdhN]
+The API Documentation can be accessed from [https://documenter.getpostman.com/view/19266444/UzXKVdhN](https://documenter.getpostman.com/view/19266444/UzXKVdhN)
