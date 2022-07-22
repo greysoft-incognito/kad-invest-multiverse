@@ -2,11 +2,16 @@
 
 namespace App\Providers;
 
-// use Illuminate\Support\Facades\Gate;
+use App\Models\v1\User as V1User;
+use App\Traits\Permissions;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
+    use Permissions;
+
     /**
      * The model to policy mappings for the application.
      *
@@ -25,6 +30,10 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
+        Gate::define('usable', function (V1User $user, $permission) {
+            return ($check = $this->setPermissionsUser($user)->checkPermissions($permission)) === true
+                ? Response::allow()
+                : Response::deny($check);
+        });
     }
 }

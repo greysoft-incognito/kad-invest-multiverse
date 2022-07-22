@@ -1,18 +1,12 @@
 <?php
 
-use App\Http\Controllers\Api\v1\CategoryController;
-use App\Http\Controllers\Api\v1\CompanyController as V1CompanyController;
-use App\Http\Controllers\Api\v1\HomeController;
-use App\Http\Controllers\Api\v1\ServiceController;
-use App\Http\Controllers\Api\v1\Tools\ColorExtractor;
-use App\Http\Controllers\Api\v1\Tools\ImageController;
-use App\Http\Controllers\Api\v1\User\Account;
-use App\Http\Controllers\Api\v1\User\AlbumController;
-use App\Http\Controllers\Api\v1\User\CompanyController;
-use App\Http\Controllers\Api\v1\User\OffersController;
-use App\Http\Controllers\Api\v1\User\ServiceController as UserServiceController;
-use App\Http\Controllers\Api\v1\User\TransactionController;
-use App\Http\Controllers\Api\v1\User\VisionBoardController;
+use App\Http\Controllers\v1\Guest\FormController;
+use App\Http\Controllers\v1\Guest\FormDataController;
+use App\Http\Controllers\v1\Guest\FormFieldController;
+use App\Http\Controllers\v1\Manage\FormController as SuFormController;
+use App\Http\Controllers\v1\Manage\FormDataController as SuFormDataController;
+use App\Http\Controllers\v1\Manage\FormFieldController as SuFormFieldController;
+use App\Http\Controllers\v1\Manage\UsersController;
 use Illuminate\Support\Facades\Route;
 
 header('SameSite:  None');
@@ -28,68 +22,30 @@ header('SameSite:  None');
 |
 */
 
-Route::name('home.')->controller(HomeController::class)->group(function () {
-    Route::get('/get/settings', 'settings')->name('settings');
-    Route::post('/get/color-palette', [ColorExtractor::class, 'index'])->name('color.palette');
+Route::name('home.')->group(function () {
+    // Route::get('/get/settings', 'settings')->name('settings');
+    Route::apiResource('get/forms', FormController::class)->only(['index', 'show']);
+    Route::get('get/form-fields/form/{form}', [FormFieldController::class, 'form']);
+    Route::apiResource('get/form-fields', FormFieldController::class)->parameters(['form-fields' => 'id'])->only(['index', 'show']);
+    Route::apiResource('get/form-data/{form_id}', FormDataController::class)->parameters(['{form_id}' => 'id'])->only(['store', 'update', 'show']);
 });
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::name('account.')->prefix('account')->group(function () {
-        Route::get('/', [Account::class, 'index'])->name('index');
-        Route::get('/wallet', [Account::class, 'wallet'])->name('wallet');
-        Route::put('update', [Account::class, 'update'])->name('update');
-        Route::put('update-password', [Account::class, 'updatePassword'])->name('update.password');
-        Route::put('update-profile-picture', [Account::class, 'updateProfilePicture'])->name('update.profile.picture');
-        Route::put('default-company', [Account::class, 'updateDefaultCompany'])->name('update.default.comapny');
-
-        Route::name('companies.')->prefix('companies')->controller(CompanyController::class)->group(function () {
-            Route::put('{company}/update-profile-picture/{type}', 'changeDp')->name('changeDp');
-            Route::apiResource('{company}/services', UserServiceController::class);
-            Route::name('services.')->prefix('{company}/services')->controller(UserServiceController::class)->group(function () {
-                Route::get('/type/{type?}', 'index')->name('type');
-                Route::name('offers.')->prefix('{service}/offers')->controller(OffersController::class)->group(function () {
-                    Route::get('/', 'index')->name('offers');
-                    Route::get('/{offer}', 'show')->name('show');
-                    Route::post('/', 'store');
-                    Route::put('/{offer}', 'update');
-                    Route::delete('/{offer}', 'destroy');
-                });
-            });
-        });
-        Route::apiResource('companies', CompanyController::class);
-
-        Route::get('transactions/{status?}', [TransactionController::class, 'index'])->name('index');
-        Route::get('transactions/{reference}/invoice', [TransactionController::class, 'invoice'])->name('invoice');
-        Route::apiResource('transactions', TransactionController::class)->except('index');
-
-        Route::apiResource('albums', AlbumController::class);
-        Route::apiResource('boards', VisionBoardController::class);
+    Route::name('admin.')->prefix('admin')->middleware(['admin'])->group(function () {
+        Route::apiResource('forms', SuFormController::class)->only(['index', 'show']);
+        Route::get('form-fields/form/{form}', [SuFormFieldController::class, 'form']);
+        Route::apiResource('get/form-fields', SuFormFieldController::class)->parameters(['form-fields' => 'id']);
+        Route::get('form-data/all', [SuFormDataController::class, 'all'])->name('all');
+        Route::apiResource('form-data/{form_id}', SuFormDataController::class)->parameters(['{form_id}' => 'id']);
+        Route::apiResource('users', UsersController::class);
     });
 
-    Route::apiResource('categories', CategoryController::class)->only(['index', 'show'])->scoped([
-        'category' => 'slug',
-    ]);
-
-    Route::name('companies.')->prefix('companies')->controller(V1CompanyController::class)->group(function () {
-        Route::get('/featured', 'featured')->name('featured');
-        Route::get('/{company:slug}', 'show')->name('show');
-        Route::name('services.')->prefix('{company:slug}/services')->controller(ServiceController::class)->group(function () {
-            Route::get('/{type?}', 'companyIndex')->name('companyIndex');
-        });
-    });
-
-    Route::name('images.')->prefix('images')->controller(ImageController::class)->group(function () {
-        Route::post('/storage', 'store')->name('store');
-        Route::delete('/storage/{id}', 'destroy')->name('destroy');
-        Route::put('/storage/{id}', 'update')->name('update');
-        Route::put('/{type}/grid/{imageable_id}', 'updateGrid')->name('grid.update');
-    });
-
-    Route::name('services.')->prefix('services')->controller(ServiceController::class)->group(function () {
-        Route::get('/', 'index')->name('index');
-        Route::get('/{service}/reviews', 'reviews')->name('service.reviews');
-        Route::get('/{service:slug}', [ServiceController::class, 'show'])->name('service.show');
-        Route::post('/checkout', 'checkout')->name('service.checkout');
+    Route::name('manage.')->prefix('manage')->group(function () {
+        Route::apiResource('forms', SuFormController::class)->only(['index', 'show']);
+        Route::get('form-fields/form/{form}', [SuFormFieldController::class, 'form']);
+        Route::apiResource('get/form-fields', SuFormFieldController::class)->parameters(['form-fields' => 'id']);
+        Route::get('form-data/all', [SuFormDataController::class, 'all'])->name('all');
+        Route::apiResource('form-data/{form_id}', SuFormDataController::class)->parameters(['{form_id}' => 'id']);
     });
 
     Route::get('/playground', function () {

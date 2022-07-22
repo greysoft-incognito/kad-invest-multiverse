@@ -2,8 +2,8 @@
 
 namespace App\Traits;
 
-use App\Container\AppInfo;
-use App\EnumsAndConsts\HttpStatus;
+use App\Services\AppInfo;
+use App\Services\HttpStatus;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Facades\Auth;
 
