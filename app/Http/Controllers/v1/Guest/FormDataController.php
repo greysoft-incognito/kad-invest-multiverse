@@ -59,7 +59,7 @@ class FormDataController extends Controller
         $errors = collect([]);
         $validation_rules = [];
         $custom_attributes = [];
-        foreach ($request->get('data') as $key => $value) {
+        foreach ($request->get('data', []) as $key => $value) {
             if ($form->fields->pluck('name')->doesntContain($key)) {
                 $errors->push([$key => "$key is not a valid input."]);
             }
@@ -99,6 +99,9 @@ class FormDataController extends Controller
 
         $key = $form->fields->firstWhere('key', true)->name ?? $form->fields->first()->name;
         $data = $request->get('data');
+        if (!$data) {
+            throw ValidationException::withMessages(['data' => 'No data passed']);
+        }
         $formdata = GenericFormData::create([
             'form_id' => $form_id,
             'data' => $data,
