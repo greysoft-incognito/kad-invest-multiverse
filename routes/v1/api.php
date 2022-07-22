@@ -7,6 +7,7 @@ use App\Http\Controllers\v1\Manage\FormController as SuFormController;
 use App\Http\Controllers\v1\Manage\FormDataController as SuFormDataController;
 use App\Http\Controllers\v1\Manage\FormFieldController as SuFormFieldController;
 use App\Http\Controllers\v1\Manage\UsersController;
+use App\Services\AppInfo;
 use Illuminate\Support\Facades\Route;
 
 header('SameSite:  None');
@@ -23,6 +24,11 @@ header('SameSite:  None');
 */
 
 Route::name('home.')->group(function () {
+    Route::get('/', function () {
+        return [
+            'Welcome to the GreyMultiverse API v1' => AppInfo::basic(),
+        ];
+    });
     // Route::get('/get/settings', 'settings')->name('settings');
     Route::apiResource('get/forms', FormController::class)->only(['index', 'show']);
     Route::get('get/form-fields/form/{form}', [FormFieldController::class, 'form']);
