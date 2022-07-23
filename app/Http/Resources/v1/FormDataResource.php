@@ -15,13 +15,11 @@ class FormDataResource extends JsonResource
      */
     public function toArray($request)
     {
-        return [
-            'id' => $this->id,
-            'form_id' => $this->form_id,
-            'key' => $this->key,
-            'form' => collect($this->data)->merge(['id' => $this->id, 'form_id' => $this->form_id]),
+        return collect($this->data)->merge([
+            'id' => $this->id, 
+            'form_id' => $this->form_id, 
             'fields' => $this->form->fields,
-        ];
+        ]);
     }
 
     /**
