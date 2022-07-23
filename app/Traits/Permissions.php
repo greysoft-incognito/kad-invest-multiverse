@@ -64,9 +64,6 @@ trait Permissions
             'transactions',
         ],
         'reviewer' => [
-            'users.list',
-            'users.user',
-
             'form.list',
             'form.show',
 
