@@ -4,6 +4,11 @@ namespace App\Services;
 
 class AppInfo
 {
+    /**
+     * Contruct the the api info
+     *
+     * @return \Illuminate\Support\Collection<TKey, TValue>
+     */
     public static function basic()
     {
         return collect([
@@ -14,6 +19,11 @@ class AppInfo
         ]);
     }
 
+    /**
+     * Put the api info into the api collection
+     *
+     * @return \Illuminate\Support\Collection<TKey, TValue>
+     */
     public static function api()
     {
         return collect([

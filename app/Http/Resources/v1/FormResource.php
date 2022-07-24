@@ -31,6 +31,6 @@ class FormResource extends JsonResource
      */
     public function with($request)
     {
-        return AppInfo::api();
+        return AppInfo::api()->toArray();
     }
 }

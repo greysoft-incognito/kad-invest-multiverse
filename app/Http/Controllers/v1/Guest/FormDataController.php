@@ -59,8 +59,10 @@ class FormDataController extends Controller
         $form = Form::whereId($form_id)->orWhere('slug', $form_id)->firstOrFail();
 
         $errors = collect([]);
-        $validation_rules = [];
-        $custom_attributes = [];
+        $validation_rules = 
+        $custom_attributes = 
+        $custom_messages = [];
+        
         foreach ($request->get('data', []) as $key => $value) {
             if ($form->fields->pluck('name')->doesntContain($key)) {
                 $errors->push([$key => "$key is not a valid input."]);
@@ -74,7 +76,12 @@ class FormDataController extends Controller
                 } else {
                     $rules[] = 'string';
                 }
-                if ($field->required) {
+                if ($field->required_if) {
+                    $rules[] = 'nullable';
+                    foreach (explode(',', $field->required_if) as $k => $r) {
+                        $rules[] = 'required_if:data.'. str($r)->replace('=',',');
+                    }
+                } elseif ($field->required) {
                     $rules[] = 'required';
                 } else {
                     $rules[] = 'nullable';
@@ -90,14 +97,21 @@ class FormDataController extends Controller
                 }
                 $validation_rules["data.$key"] = $rules;
                 $custom_attributes["data.$key"] = $field->label;
+                if ($field->custom_error) {
+                    if ($field->required_if) {
+                        $custom_messages["data.$key.required_if"] = $field->custom_error;
+                    } elseif ($field->required) {
+                        $custom_messages["data.$key.required"] = $field->custom_error;
+                    }
+                }
             }
         }
 
         if ($errors->count() > 0) {
             throw ValidationException::withMessages($errors->toArray());
         }
-
-        Validator::make($request->all(), $validation_rules, [], $custom_attributes)->validate();
+// dd($custom_messages);
+        Validator::make($request->all(), $validation_rules, $custom_messages, $custom_attributes)->validate();
 
         $key = $form->fields->firstWhere('key', true)->name ?? $form->fields->first()->name;
         $data = $request->get('data');

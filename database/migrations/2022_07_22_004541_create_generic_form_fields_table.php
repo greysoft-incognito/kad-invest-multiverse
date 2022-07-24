@@ -21,7 +21,9 @@ return new class extends Migration
             $table->string('value')->nullable();
             $table->string('field_id')->nullable()->default('field');
             $table->string('hint')->nullable();
+            $table->string('custom_error')->nullable();
             $table->json('options')->nullable();
+            $table->string('required_if')->nullable();
             $table->boolean('restricted')->default(false);
             $table->boolean('required')->default(true);
             $table->boolean('key')->default(false);

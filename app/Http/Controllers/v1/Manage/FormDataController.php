@@ -77,7 +77,11 @@ class FormDataController extends Controller
                 } else {
                     $rules[] = 'string';
                 }
-                if ($field->required) {
+                if ($field->required_if) {
+                    foreach (explode(',', $field->required_if) as $k => $r) {
+                        $rules[] = 'required_if:'. str($r)->replace('=',',');
+                    }
+                } elseif ($field->required) {
                     $rules[] = 'required';
                 } else {
                     $rules[] = 'nullable';
