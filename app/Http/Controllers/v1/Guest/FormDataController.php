@@ -8,6 +8,8 @@ use App\Http\Resources\v1\FormDataResource;
 use App\Models\v1\Form;
 use App\Models\v1\GenericFormData;
 use App\Services\HttpStatus;
+use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -59,49 +61,74 @@ class FormDataController extends Controller
         $form = Form::whereId($form_id)->orWhere('slug', $form_id)->firstOrFail();
 
         $errors = collect([]);
-        $validation_rules = 
-        $custom_attributes = 
-        $custom_messages = [];
+
+        $custom_messages = $form->fields->filter(fn($f)=>$f->custom_error)->mapWithKeys(function($field, $key) {
+            if ($field->required_if) {
+                return ["data.$field->name.required_if" => $field->custom_error];
+            } elseif ($field->required) {
+                return ["data.$field->name.required" => $field->custom_error];
+            }
+        })->toArray();
+        
+        $custom_attributes = $form->fields->mapWithKeys(function($field, $key) {
+            return ['data.'.$field->name => $field->label];
+        })->toArray();
+
+        $validation_rules = $form->fields->mapWithKeys(function($field, $key) {
+            if ($field->type === 'number') {
+                $rules[] = 'numeric';
+            } else {
+                $rules[] = 'string';
+            }
+            if ($field->required_if) {
+                $rules[] = 'nullable';
+                foreach (explode(',', $field->required_if) as $k => $r) {
+                    $rules[] = 'required_if:data.'. str($r)->replace('=',',');
+                }
+            } elseif ($field->required) {
+                $rules[] = 'required';
+            } else {
+                $rules[] = 'nullable';
+            }
+            if ($field->type === 'url') {
+                $rules[] = 'url';
+            }
+            if ($field->type !== 'date') {
+                if ($field->min) {
+                    $rules[] = "min:$field->min";
+                }
+                if ($field->max) {
+                    $rules[] = "min:$field->max";
+                }
+            }
+            
+            if ($field->type === 'email') {
+                $rules[] = 'email';
+            }
+            if ($field->options) {
+                $rules[] = 'in:'.collect($field->options)->pluck('value')->implode(',');
+            }
+            return ['data.'.$field->name => $rules];
+        })->toArray();
         
         foreach ($request->get('data', []) as $key => $value) {
             if ($form->fields->pluck('name')->doesntContain($key)) {
                 $errors->push([$key => "$key is not a valid input."]);
             }
-
-            $rules = [];
             if ($form->fields->pluck('name')->contains($key)) {
+                
                 $field = $form->fields->firstWhere('name', $key);
-                if ($field->type === 'number') {
-                    $rules[] = 'numeric';
-                } else {
-                    $rules[] = 'string';
-                }
-                if ($field->required_if) {
-                    $rules[] = 'nullable';
-                    foreach (explode(',', $field->required_if) as $k => $r) {
-                        $rules[] = 'required_if:data.'. str($r)->replace('=',',');
+
+                if ($field->type === 'date' && str($key)->contains(['dob', 'age', 'date_of_birth', 'birth_date'])) {
+                    $parseDate = \DateTime::createFromFormat('D M d Y H:i:s e+', $value);
+                    $date = ($parseDate !== false) ? CarbonImmutable::parse($parseDate) : new Carbon($value);
+                    
+                    if ($field->min && $date->diffInYears(Carbon::now()) < $field->min) {
+                        $errors->push([$key => __("The minimum age requirement for this application is :0.", [$field->max])]);
                     }
-                } elseif ($field->required) {
-                    $rules[] = 'required';
-                } else {
-                    $rules[] = 'nullable';
-                }
-                if ($field->type === 'url') {
-                    $rules[] = 'url';
-                }
-                if ($field->type === 'email') {
-                    $rules[] = 'email';
-                }
-                if ($field->options) {
-                    $rules[] = 'in:'.collect($field->options)->pluck('value')->implode(',');
-                }
-                $validation_rules["data.$key"] = $rules;
-                $custom_attributes["data.$key"] = $field->label;
-                if ($field->custom_error) {
-                    if ($field->required_if) {
-                        $custom_messages["data.$key.required_if"] = $field->custom_error;
-                    } elseif ($field->required) {
-                        $custom_messages["data.$key.required"] = $field->custom_error;
+                    
+                    if ($field->max && $date->diffInYears(Carbon::now()) > $field->max) {
+                        $errors->push([$key => __("The age limit for this application is :0.", [$field->max])]);
                     }
                 }
             }
@@ -110,7 +137,7 @@ class FormDataController extends Controller
         if ($errors->count() > 0) {
             throw ValidationException::withMessages($errors->toArray());
         }
-// dd($custom_messages);
+
         Validator::make($request->all(), $validation_rules, $custom_messages, $custom_attributes)->validate();
 
         $key = $form->fields->firstWhere('key', true)->name ?? $form->fields->first()->name;

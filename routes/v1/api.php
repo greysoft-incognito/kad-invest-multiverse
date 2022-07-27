@@ -42,6 +42,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('form-fields/form/{form}', [SuFormFieldController::class, 'form']);
         Route::apiResource('get/form-fields', SuFormFieldController::class)->parameters(['form-fields' => 'id']);
         Route::get('form-data/all', [SuFormDataController::class, 'all'])->name('all');
+        Route::get('form-data/stats', [SuFormDataController::class, 'stats'])->name('stats');
         Route::apiResource('form-data/{form_id}', SuFormDataController::class)->parameters(['{form_id}' => 'id']);
         Route::apiResource('users', UsersController::class);
     });
@@ -51,6 +52,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('form-fields/form/{form}', [SuFormFieldController::class, 'form']);
         Route::apiResource('get/form-fields', SuFormFieldController::class)->parameters(['form-fields' => 'id']);
         Route::get('form-data/all', [SuFormDataController::class, 'all'])->name('all');
+        Route::get('form-data/stats', [SuFormDataController::class, 'stats'])->name('stats');
         Route::apiResource('form-data/{form_id}', SuFormDataController::class)->parameters(['{form_id}' => 'id']);
     });
 

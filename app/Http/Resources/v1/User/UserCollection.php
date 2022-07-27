@@ -28,6 +28,6 @@ class UserCollection extends ResourceCollection
      */
     public function with($request)
     {
-        return AppInfo::api()->toArray();
+        return AppInfo::api();
     }
 }

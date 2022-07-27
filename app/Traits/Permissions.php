@@ -29,6 +29,7 @@ trait Permissions
             'formfield.update',
             'formfield.delete',
 
+            'formdata.stats',
             'formdata.list',
             'formdata.show',
 
@@ -56,6 +57,7 @@ trait Permissions
             'formfield.update',
             'formfield.delete',
 
+            'formdata.stats',
             'formdata.list',
             'formdata.show',
 
@@ -67,6 +69,7 @@ trait Permissions
             'form.list',
             'form.show',
 
+            'formdata.stats',
             'formfield.list',
             'formfield.show',
 

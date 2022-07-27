@@ -30,8 +30,6 @@ class FormDataResource extends JsonResource
      */
     public function with($request)
     {
-        return AppInfo::api()
-            ->merge(['fields' => $this->form->fields])
-            ->toArray();
+        return AppInfo::with(['fields' => $this->form->fields]);
     }
 }

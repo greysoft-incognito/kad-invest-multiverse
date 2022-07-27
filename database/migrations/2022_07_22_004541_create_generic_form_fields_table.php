@@ -27,6 +27,8 @@ return new class extends Migration
             $table->boolean('restricted')->default(false);
             $table->boolean('required')->default(true);
             $table->boolean('key')->default(false);
+            $table->integer('min')->nullable();
+            $table->integer('max')->nullable();
             $table->enum('element', ['input', 'textarea', 'select'])->default('input');
             $table->enum('type', [
                 'hidden',

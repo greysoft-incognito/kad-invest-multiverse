@@ -143,6 +143,38 @@ class FormDataController extends Controller
     }
 
     /**
+     * Display the stats for the resources resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function stats(Request $request)
+    {
+        \Gate::authorize('usable', 'formdata.stats');
+
+        if ($request->data) {
+            $data = collect(str($request->data)->explode(',')->mapWithKeys(function($value) {
+                $stat = str($value)->explode(':');
+
+                $key = is_numeric($stat[1]??$stat[0]) || is_bool($stat[1]??$stat[0]) 
+                    ? $stat[0] 
+                    : $stat[1]??$stat[0];
+
+                return [$key => GenericFormData::where("data->{$stat[0]}", $stat[1]??'')->count()];
+            }))->merge(['total' => GenericFormData::count()]);
+        } else {
+            $data = ['total' => GenericFormData::count()];
+        }
+
+        return $this->buildResponse([
+            'message' => HttpStatus::message(HttpStatus::OK),
+            'status' => 'success',
+            'status_code' => HttpStatus::OK,
+            'data' => $data,
+        ]);
+    }
+
+    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request

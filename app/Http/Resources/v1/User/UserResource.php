@@ -43,6 +43,6 @@ class UserResource extends JsonResource
      */
     public function with($request)
     {
-        return AppInfo::api()->toArray();
+        return AppInfo::api();
     }
 }
