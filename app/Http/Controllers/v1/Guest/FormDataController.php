@@ -119,7 +119,7 @@ class FormDataController extends Controller
                 
                 $field = $form->fields->firstWhere('name', $key);
 
-                if ($field->type === 'date' && str($key)->contains(['dob', 'age', 'date_of_birth', 'birth_date'])) {
+                if ($field->required && $field->type === 'date' && str($key)->contains(['dob', 'age', 'date_of_birth', 'birth_date'])) {
                     $parseDate = \DateTime::createFromFormat('D M d Y H:i:s e+', $value);
                     $date = ($parseDate !== false) ? CarbonImmutable::parse($parseDate) : new Carbon($value);
                     
