@@ -17,6 +17,15 @@ return new class extends Migration
             $table->id();
             $table->string('name')->nullable();
             $table->string('slug')->nullable();
+            $table->string('title')->nullable();
+            $table->string('external_link')->nullable();
+            $table->string('logo')->nullable();
+            $table->string('banner')->nullable();
+            $table->string('banner_title')->nullable();
+            $table->text('banner_info')->fullText()->nullable();
+            $table->json('socials')->nullable();
+            $table->timestamp('deadline')->nullable();
+            $table->string('template')->default('default');
             $table->timestamps();
         });
     }

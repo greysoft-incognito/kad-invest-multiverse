@@ -18,10 +18,12 @@ return new class extends Migration
             $table->foreignId('form_id')->constrained('forms', 'id')->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('label')->nullable()->default('Field');
             $table->string('name')->nullable()->default('field');
+            $table->string('alias')->nullable()->nullable();
             $table->string('value')->nullable();
             $table->string('field_id')->nullable()->default('field');
             $table->string('hint')->nullable();
             $table->string('custom_error')->nullable();
+            $table->string('compare')->nullable();
             $table->json('options')->nullable();
             $table->string('required_if')->nullable();
             $table->boolean('restricted')->default(false);

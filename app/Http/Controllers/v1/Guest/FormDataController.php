@@ -119,29 +119,38 @@ class FormDataController extends Controller
                 
                 $field = $form->fields->firstWhere('name', $key);
 
-                if ($field->required && $field->type === 'date' && str($key)->contains(['dob', 'age', 'date_of_birth', 'birth_date'])) {
+                if ($field->required && $field->type === 'date' && $field->compare) {
                     $parseDate = \DateTime::createFromFormat('D M d Y H:i:s e+', $value);
+                    $parseCompare = \DateTime::createFromFormat('D M d Y H:i:s e+', $field->compare);
                     $date = ($parseDate !== false) ? CarbonImmutable::parse($parseDate) : new Carbon($value);
+                    $compare = ($parseCompare !== false) ? CarbonImmutable::parse($parseCompare) : new Carbon($field->compare);
+                    $compare = $compare->format('jS M, Y');
+                    $diff = $date->diffInYears($compare);
                     
-                    if ($field->min && $date->diffInYears(Carbon::now()) < $field->min) {
-                        $errors->push([$key => __("The minimum age requirement for this application is :0.", [$field->max])]);
+                    if ($field->min && $diff < $field->min) {
+                        $errors->push(['data.'.$key => __("The minimum :1 requirement for this application is :0, your :2 puts you at :3 by :4.", [$field->max, $field->alias, $field->label, $diff, $compare])]);
                     }
                     
-                    if ($field->max && $date->diffInYears(Carbon::now()) > $field->max) {
-                        $errors->push([$key => __("The age limit for this application is :0.", [$field->max])]);
+                    if ($field->max && $diff > $field->max) {
+                        $errors->push(['data.'.$key => __("The :1 limit for this application is :0, your :2 puts you at :3 by :4.", [$field->max, $field->alias, $field->label, $diff, $compare])]);
                     }
                 }
             }
         }
 
-        if ($errors->count() > 0) {
-            throw ValidationException::withMessages($errors->toArray());
-        }
-
-        Validator::make($request->all(), $validation_rules, $custom_messages, $custom_attributes)->validate();
+        $validator = Validator::make($request->all(), $validation_rules, $custom_messages, $custom_attributes);
+        $validator->after(function ($validator) use ($errors) {
+            if ($errors->count() > 0) {
+                foreach ($errors->toArray() as $key => $error) {
+                    $validator->errors()->add(collect($error)->keys()->first(), collect($error)->first());
+                }
+            }
+        });
+        $validator->validate();
 
         $key = $form->fields->firstWhere('key', true)->name ?? $form->fields->first()->name;
         $data = $request->get('data');
+        
         if (!$data) {
             throw ValidationException::withMessages(['data' => 'No data passed']);
         }

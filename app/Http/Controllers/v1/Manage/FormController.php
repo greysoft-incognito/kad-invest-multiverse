@@ -7,6 +7,7 @@ use App\Http\Resources\v1\FormCollection;
 use App\Http\Resources\v1\FormResource;
 use App\Models\v1\Form;
 use App\Services\HttpStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class FormController extends Controller
@@ -20,13 +21,36 @@ class FormController extends Controller
     public function index(Request $request)
     {
         \Gate::authorize('usable', 'form.list');
-        $forms = Form::paginate($request->get('limit', 30));
+        $query = Form::query();
+        // Search and filter columns
+        if ($request->search) {
+            $query->where(function ($query) use ($request) {
+                $query->where('title', 'like', "%$request->search%");
+                $query->orWhereFullText('banner_info', $request->search);
+                $query->orWhereHas('infos', function (Builder $query) use ($request) {
+                    $query->where('title', 'like', "%$request->search%");
+                    $query->orWhereFullText('content', $request->search);
+                });
+            });
+        }
 
-        return (new FormCollection($forms))->additional([
+        // Reorder Columns
+        if ($request->order && is_array($request->order)) {
+            foreach ($request->order as $key => $dir) {
+                if ($dir === 'desc') {
+                    $query->orderByDesc($key ?? 'id');
+                } else {
+                    $query->orderBy($key ?? 'id');
+                }
+            }
+        }
+        $forms = $query->paginate($request->get('limit', 30));
+
+        return (new FormCollection($forms))->additional(array_merge([
             'message' => HttpStatus::message(HttpStatus::OK),
             'status' => 'success',
             'status_code' => HttpStatus::OK,
-        ]);
+        ], $request->search ? ['total_results' => $query->count()] : []));
     }
 
     /**
@@ -38,7 +62,37 @@ class FormController extends Controller
     public function store(Request $request)
     {
         \Gate::authorize('usable', 'form.create');
-        //
+        $request->validate([
+            'name' => 'required|string|min:3|max:55',
+            'title' => 'required|string|min:3|max:55',
+            'external_link' => 'nullable|url',
+            'logo' => 'nullable|image|mimes:jpg,png|max:1524',
+            'banner' => 'nullable|image|mimes:jpg,png|max:1524',
+            'banner_title' => 'nullable|string',
+            'banner_info' => 'nullable|string',
+            'socials' => 'nullable|array',
+            'deadline' => 'nullable|string',
+            'template' => 'nullable',
+        ]);
+
+        $form = new Form;
+        $form->name = $request->name;
+        $form->title = $request->title;
+        $form->external_link = $request->external_link;
+        $form->logo = $request->logo;
+        $form->banner = $request->banner;
+        $form->banner_title = $request->banner_title;
+        $form->banner_info = $request->banner_info;
+        $form->socials = $request->socials;
+        $form->deadline = $request->deadline;
+        $form->template = $request->template;
+        $form->save();
+        
+        return (new FormResource($form))->additional([
+            'message' => __("Your form has been created successfully."),
+            'status' => 'success',
+            'status_code' => HttpStatus::OK,
+        ]);
     }
 
     /**
@@ -69,7 +123,38 @@ class FormController extends Controller
     public function update(Request $request, $id)
     {
         \Gate::authorize('usable', 'form.update');
-        //
+        $form = Form::findOrFail($id);
+        
+        $request->validate([
+            'name' => 'required|string|min:3|max:55',
+            'title' => 'required|string|min:3|max:55',
+            'external_link' => 'nullable|url',
+            'logo' => 'nullable|image|mimes:jpg,png',
+            'banner' => 'nullable|image|mimes:jpg,png',
+            'banner_title' => 'nullable|string',
+            'banner_info' => 'nullable|string',
+            'socials' => 'nullable|array',
+            'deadline' => 'nullable|string',
+            'template' => 'nullable',
+        ]);
+
+        $form->name = $request->name;
+        $form->title = $request->title;
+        $form->external_link = $request->external_link;
+        $form->logo = $request->logo;
+        $form->banner = $request->banner;
+        $form->banner_title = $request->banner_title;
+        $form->banner_info = $request->banner_info;
+        $form->socials = $request->socials;
+        $form->deadline = $request->deadline;
+        $form->template = $request->template;
+        $form->save();
+        
+        return (new FormResource($form))->additional([
+            'message' => __("{$form->name} has been updated successfully."),
+            'status' => 'success',
+            'status_code' => HttpStatus::ACCEPTED,
+        ])->response()->setStatusCode(HttpStatus::ACCEPTED);
     }
 
     /**
@@ -78,9 +163,42 @@ class FormController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         \Gate::authorize('usable', 'form.delete');
-        //
+        if ($request->items) {
+            $count = collect($request->items)->map(function ($item) {
+                $form = Form::whereId($item)->first();
+                if ($form) {
+                    return $form->delete();
+                }
+
+                return false;
+            })->filter(fn ($i) =>$i !== false)->count();
+
+            return $this->buildResponse([
+                'message' => "{$count} forms have been deleted.",
+                'status' =>  'success',
+                'status_code' => HttpStatus::OK,
+            ]);
+        } else {
+            $form = Form::whereId($id)->first();
+        }
+
+        if ($form) {
+            $form->delete();
+
+            return $this->buildResponse([
+                'message' => "{$form->name} has been deleted.",
+                'status' =>  'success',
+                'status_code' => HttpStatus::ACCEPTED,
+            ]);
+        }
+
+        return $this->buildResponse([
+            'message' => 'The requested form no longer exists.',
+            'status' => 'error',
+            'status_code' => HttpStatus::NOT_FOUND,
+        ]);
     }
 }
