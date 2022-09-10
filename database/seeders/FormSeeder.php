@@ -19,21 +19,19 @@ class FormSeeder extends Seeder
         }
         Form::insert([
             [
-                'name' => 'Kukah Foundation',
-                'slug' => str('Kukah Foundation')->slug(),
-                'title' => 'The Kukah Prize for Young Innovators',
-                'logo' => 'https://greysoft.ng/pe/kuklogo.png',
-                'banner' => 'https://img.freepik.com/free-photo/system-developers-analyzing-code-wall-screen-tv-looking-errors-while-team-coders-collaborate-artificial-intelligence-project-programmers-working-together-machine-learning-software_482257-41819.jpg?w=2000',
-                'banner_title' => 'The Kukah Prize for Young Innovators',
-                'banner_info' => 'The Kukah Prize for Young Innovators is intended to support and spur young and innovative Africans whose ideas embody the potential to transform their communities and the world around us.                ',
-                'deadline' => '2022-08-10',
+                'name' => 'KADVINVEST 7.0',
+                'slug' => str('KADVINVEST 7.0')->slug(),
+                'title' => 'BUILDING A RESILIENT ECONOMY',
+                'logo' => 'http://kadinvest.live/imgs/header/Kadinvest.png',
+                'banner' => 'http://kadinvest.live/imgs/header/theme.png',
+                'banner_title' => 'KADVINVEST 7.0',
+                'banner_info' => 'BUILDING A RESILIENT ECONOMY',
+                'deadline' => '2022-10-13',
                 'socials' => json_encode([
-                    'whatsapp' => '07060998702',
-                    'facebook' => 'http://facebook.com/thekukahprize',
-                    'twitter' => 'http://twitter.com/thekukahprize',
-                    'linkedin' => 'http://linkedin.com/in/thekukahprize',
-                    'email' => 'mailto:thekukahprize@greysoft.ng',
-                    'other' => 'http://facebook.com/thekukahprize',
+                    'facebook' => 'https://web.facebook.com/InvestKaduna?_rdc=1&_rdr',
+                    'twitter' => 'https://twitter.com/InvestKaduna?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor',
+                    'instagram' => 'https://www.instagram.com/accounts/login/?next=/investkaduna/',
+                    'linkedin' => 'https://ng.linkedin.com/company/kadipa',
                 ]),
             ],
         ]);
