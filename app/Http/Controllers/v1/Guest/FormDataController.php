@@ -7,6 +7,7 @@ use App\Http\Resources\v1\FormDataCollection;
 use App\Http\Resources\v1\FormDataResource;
 use App\Models\v1\Form;
 use App\Models\v1\GenericFormData;
+use App\Notifications\FormSubmitedSuccessfully;
 use App\Services\HttpStatus;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
@@ -159,6 +160,8 @@ class FormDataController extends Controller
             'data' => $data,
             'key' => $data[$key] ?? '',
         ]);
+
+        $formdata->notify(new FormSubmitedSuccessfully());
 
         return (new FormDataResource($formdata))->additional([
             'message' => HttpStatus::message(HttpStatus::CREATED),

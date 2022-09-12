@@ -40,6 +40,7 @@ trait Permissions
             'front_content',
             'subscriptions',
             'transactions',
+            'configuration',
         ],
         'manager' => [
             'users.list',

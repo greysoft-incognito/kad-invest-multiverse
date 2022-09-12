@@ -185,6 +185,7 @@ return [
         /*
          * Package Service Providers...
          */
+        hrace009\ConfigWriter\ServiceProvider::class,
 
         /*
          * Application Service Providers...

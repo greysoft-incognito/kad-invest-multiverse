@@ -27,6 +27,9 @@ class FormSeeder extends Seeder
                 'banner_title' => 'KADVINVEST 7.0',
                 'banner_info' => 'BUILDING A RESILIENT ECONOMY',
                 'deadline' => '2022-10-13',
+                'error_message' => 'Hello :fullname, Unfortunattely we could not submit your form.',
+                'success_message' => 'Hello :fullname, This is to confirm your submssion of this form was successfull.
+                Here is your QR Code :qrcode.',
                 'socials' => json_encode([
                     'facebook' => 'https://web.facebook.com/InvestKaduna?_rdc=1&_rdr',
                     'twitter' => 'https://twitter.com/InvestKaduna?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor',

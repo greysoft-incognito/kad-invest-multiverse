@@ -98,7 +98,6 @@
                 border-color: #34495e !important;
             }
         }
-
     </style>
 </head>
 
@@ -170,6 +169,14 @@
                                                                                     </h1>
                                                                                 </td>
                                                                             @endisset
+                                                                            @isset($cta['qrcode'])
+                                                                                <td style="font-family: sans-serif; font-size: 1.3em; vertical-align: top; border-radius: 5px; text-align: center; background-color: #fff;display: flex;"
+                                                                                    valign="top" align="center"
+                                                                                    bgcolor="#3498db">
+                                                                                    <img src="{{ route('form.data.qr', $cta['qrcode']) }}"
+                                                                                        alt="QR Code" style="width: 150px;">
+                                                                                </td>
+                                                                            @endisset
                                                                             @isset($cta['link'])
                                                                                 <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background-color: #3498db;"
                                                                                     valign="top" align="center"
@@ -230,7 +237,7 @@
                                     valign="top" align="center">
                                     <span class="apple-link"
                                         style="color: #999999; font-size: 12px; text-align: center;">
-                                        Agrobays, 31 Gwari Avenue, Barnawa, Kaduna.
+                                        Greysoft Technologies, 31 Gwari Avenue, Barnawa, Kaduna.
                                     </span>
                                 </td>
                             </tr>
@@ -240,7 +247,8 @@
                                     valign="top" align="center">
                                     Powered by
                                     <a href="#"
-                                        style="color: #999999; font-size: 12px; text-align: center; text-decoration: none;">Agrobays
+                                        style="color: #999999; font-size: 12px; text-align: center; text-decoration: none;">Greysoft
+                                        Technologies
                                     </a>.
                                 </td>
                             </tr>

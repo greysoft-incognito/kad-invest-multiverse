@@ -57,7 +57,7 @@ class Media
      * @param  string  $src
      * @return string
      */
-    public function image(string $type, string $src = null): string|null
+    public function image(string $type, string $src = null, $get_path = false): string|null
     {
         $getPath = Arr::get($this->namespaces, $type.'.path');
         $default = Arr::get($this->namespaces, $type.'.default');
@@ -71,9 +71,15 @@ class Media
             if (filter_var($default, FILTER_VALIDATE_URL)) {
                 return $default;
             } elseif (! Storage::exists($prefix.$getPath.$default)) {
+                if ($get_path === true) {
+                    return Storage::path($this->default_media);
+                }
                 return asset($this->default_media);
             }
 
+            if ($get_path === true) {
+                return Storage::path($getPath.$default);
+            }
             return asset($getPath.$default);
         }
 
@@ -81,6 +87,9 @@ class Media
             return route('get.image', ['file' => base64url_encode($getPath.$src)]);
         }
 
+        if ($get_path === true) {
+            return Storage::path($getPath.$src);
+        }
         return asset($getPath.$src);
     }
 

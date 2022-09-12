@@ -1,14 +1,13 @@
 <?php
 
-use App\Http\Controllers\v1\Guest\FormController;
-use App\Http\Controllers\v1\Guest\FormDataController;
-use App\Http\Controllers\v1\Guest\FormFieldController;
+use App\Http\Controllers\ScanHistoryController;
 use App\Http\Controllers\v1\Manage\FormController as SuFormController;
 use App\Http\Controllers\v1\Manage\FormDataController as SuFormDataController;
 use App\Http\Controllers\v1\Manage\FormFieldController as SuFormFieldController;
 use App\Http\Controllers\v1\Manage\FormInfoController;
 use App\Http\Controllers\v1\Manage\UsersController;
 use App\Services\AppInfo;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 
 header('SameSite:  None');
@@ -24,18 +23,14 @@ header('SameSite:  None');
 |
 */
 
-Route::name('home.')->group(function () {
-    Route::get('/', function () {
-        return [
-            'Welcome to the GreyMultiverse API v1' => AppInfo::basic(),
-        ];
+// Load Extra Routes
+if (file_exists(base_path('routes/v1'))) {
+    array_filter(File::files(base_path('routes/v1')), function ($file) {
+        if ($file->getExtension() === 'php') {
+            require_once $file->getPathName();
+        }
     });
-    // Route::get('/get/settings', 'settings')->name('settings');
-    Route::apiResource('get/forms', FormController::class)->only(['index', 'show']);
-    Route::get('get/form-fields/form/{form}', [FormFieldController::class, 'form']);
-    Route::apiResource('get/form-fields', FormFieldController::class)->parameters(['form-fields' => 'id'])->only(['index', 'show']);
-    Route::apiResource('get/form-data/{form}', FormDataController::class)->parameters(['{form}' => 'id'])->only(['store', 'update', 'show']);
-});
+}
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::name('admin.')->prefix('admin')->middleware(['admin'])->group(function () {
@@ -50,12 +45,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::apiResource('users', UsersController::class);
     });
 
+    Route::name('user.')->prefix('user')->group(function () {
+        // Load user's scan history
+        Route::get('scan-history', [ScanHistoryController::class, 'index'])->name('scan-history');
+        // schow scan history
+        Route::get('scan-history/{scan}', [ScanHistoryController::class, 'show'])->name('scan-history.show');
+    });
+
     Route::name('manage.')->prefix('manage')->group(function () {
         Route::apiResource('forms', SuFormController::class)->only(['index', 'show']);
         Route::get('form-fields', [SuFormFieldController::class, 'all'])->name('all');
         Route::apiResource('form-fields/{form}', SuFormFieldController::class)
             ->parameters(['{form}' => 'field'])->except(['store', 'update', 'destroy']);
         Route::get('form-data/all', [SuFormDataController::class, 'all'])->name('all');
+        Route::post('form-data/qr', [SuFormDataController::class, 'decodeQr'])->name('decode.qr');
         Route::get('form-data/stats/{form}', [SuFormDataController::class, 'stats'])->name('stats');
         Route::apiResource('form-data/{form}', SuFormDataController::class)->parameters(['{form}' => 'id']);
     });

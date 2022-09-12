@@ -35,5 +35,11 @@ class AuthServiceProvider extends ServiceProvider
                 ? Response::allow()
                 : Response::deny($check);
         });
+
+        Gate::define('can-do', function (V1User $user, $permission, $item = null) {
+            return ($check = $this->setPermissionsUser($user)->checkPermissions($permission)) === true
+                ? Response::allow()
+                : Response::deny($check);
+        });
     }
 }

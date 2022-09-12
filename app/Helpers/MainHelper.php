@@ -13,6 +13,24 @@ if (! function_exists('rangable')) {
     }
 }
 
+if (! function_exists('db_persist')) {
+    /**
+     * Persists the current working state of the database;
+     *
+     * @param  bool  $persist
+     * @return \Illuminate\Support\Collection
+     */
+    function db_persist(bool $persist = false): Illuminate\Support\Collection
+    {
+        $disk = Storage::disk('protected');
+        if (! $disk->exists('database.json') && $persist === true) {
+            $disk->put('database.json', json_encode(config('database'), JSON_PRETTY_PRINT));
+        }
+
+        return collect(json_decode($disk->get('database.json') ?? '[]', JSON_FORCE_OBJECT));
+    }
+}
+
 if (! function_exists('img')) {
     function img($image, $type = 'avatar', $cached_size = 'original', $no_default = false)
     {
@@ -100,5 +118,28 @@ if (! function_exists('random_img')) {
         } catch (\Symfony\Component\Finder\Exception\DirectoryNotFoundException | \InvalidArgumentException $e) {
             $get_link === true ? '' : $e->getMessage();
         }
+    }
+}
+
+if (! function_exists('valid_json')) {
+    /**
+     * Matches a valid json string
+     * Note that everything is atomic, JSON does not need backtracking if it is valid
+     * and this prevents catastrophic backtracking
+     *
+     * @param    $str
+     * @param    $get
+     */
+    function valid_json(string $str, $get = false, $default = null)
+    {
+        $data = json_decode($str);
+        $isValid = (json_last_error() == JSON_ERROR_NONE);
+
+        return $get === true && $isValid
+                ? $data
+                : ($default
+                    ? $default
+                    : $isValid
+                );
     }
 }
