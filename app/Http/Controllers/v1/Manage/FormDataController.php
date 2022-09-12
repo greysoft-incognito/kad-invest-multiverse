@@ -82,6 +82,43 @@ class FormDataController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function decodeQr(Request $request)
+    {
+        \Gate::authorize('usable', 'formdata.show');
+        // Use regex to extract the form_id and data_id parts of the following string 'grey:multiverse:form=1:data=23'
+        $this->validate($request, [
+            'qr' => 'required|regex:/^grey:multiverse:form=(\d+):data=(\d+)$/',
+        ], [
+            'qr.regex' => 'The QR code is invalid.',
+        ]);
+        
+        // Decode a regex string into an array
+        preg_match('/^grey:multiverse:form=(\d+):data=(\d+)$/', $request->qr, $matches);
+        $form_id = $matches[1];
+        $form_data_id = $matches[2];
+        $qr_code = $matches[0];
+
+        $data = GenericFormData::whereId($form_data_id)->firstOrFail();
+        // save this scan to the history
+        $data->scans()->create([
+            'user_id' => auth()->user()->id,
+            'qrcode' => $qr_code,
+            'form_id' => $form_id,
+        ]);
+
+        return (new FormDataResource($data))->additional([
+            'message' => HttpStatus::message(HttpStatus::OK),
+            'status' => 'success',
+            'status_code' => HttpStatus::OK,
+        ]);
+    }
+
+    /**
      * Display the stats for the resources resource.
      *
      * @param  \Illuminate\Http\Request  $request

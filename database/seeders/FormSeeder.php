@@ -27,6 +27,9 @@ class FormSeeder extends Seeder
                 'banner_title' => 'The Kukah Prize for Young Innovators',
                 'banner_info' => 'The Kukah Prize for Young Innovators is intended to support and spur young and innovative Africans whose ideas embody the potential to transform their communities and the world around us.                ',
                 'deadline' => '2022-08-10',
+                'error_message' => 'Hello :fullname, Unfortunattely we could not submit your form.',
+                'success_message' => 'Hello :fullname, This is to confirm your submssion of this form was successfull.
+                Here is your QR Code :qrcode.',
                 'socials' => json_encode([
                     'whatsapp' => '07060998702',
                     'facebook' => 'http://facebook.com/thekukahprize',

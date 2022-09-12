@@ -6,16 +6,15 @@ use App\Services\HttpStatus;
 use App\Traits\Renderer;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Validation\ValidationException;
+use Spatie\MediaLibrary\MediaCollections\Exceptions\FileUnacceptableForCollection;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
-use Symfony\Component\Mailer\Exception\TransportException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -66,14 +65,9 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $e)
     {
         if ($request->isXmlHttpRequest()) {
-            $line = (
-                $e instanceof \ErrorException ||
-                $e instanceof \Error ||
-                $e instanceof TransportException ||
-                $e instanceof QueryException
-                    ? ' in '.$e->getFile().' on line '.$e->getLine()
-                    : ''
-                );
+            $line = method_exists($e, 'getFile') ? ' in '.$e->getFile() : '';
+            $line .= method_exists($e, 'getLine') ? ' on line '.$e->getLine() : '';
+            $getMessage = method_exists($e, 'getMessage') ? $e->getMessage().$line : 'An error occured'.$line;
 
             return match (true) {
                 $e instanceof NotFoundHttpException ||
@@ -103,15 +97,16 @@ class Handler extends ExceptionHandler
                     HttpStatus::message(HttpStatus::UNPROCESSABLE_ENTITY),
                     HttpStatus::UNPROCESSABLE_ENTITY
                 ),
+                $e instanceof FileUnacceptableForCollection => $this->renderException(
+                    __('You have selected an invalid image file.'),
+                    HttpStatus::UNPROCESSABLE_ENTITY,
+                    ['errors' => [collect($request->file())->keys()->first() => __('You have selected an invalid image file.')]]
+                ),
                 $e instanceof ThrottleRequestsException => $this->renderException(
                     HttpStatus::message(HttpStatus::TOO_MANY_REQUESTS),
                     HttpStatus::TOO_MANY_REQUESTS
                 ),
-                // $e instanceof \ErrorException ||
-                // $e instanceof TransportException ||
-                // $e instanceof \Error ||
-                // $e instanceof QueryException => $this->renderException($e->getMessage().$line, HttpStatus::SERVER_ERROR),
-                default => $this->renderException(($e->getMessage() ?? 'An error occured').$line, HttpStatus::SERVER_ERROR),
+                default => $this->renderException($getMessage, HttpStatus::SERVER_ERROR),
             };
         }
 

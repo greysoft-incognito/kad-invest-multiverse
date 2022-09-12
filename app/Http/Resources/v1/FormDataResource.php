@@ -18,6 +18,7 @@ class FormDataResource extends JsonResource
         return collect([
             'id' => $this->id, 
             'form_id' => $this->form_id, 
+            'fields' => $this->form->fields,
         ])
         ->merge($this->data);
     }
