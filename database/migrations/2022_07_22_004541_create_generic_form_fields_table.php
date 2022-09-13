@@ -45,6 +45,7 @@ return new class extends Migration
                 'tel',
                 'url',
                 'checkbox',
+                'multiple',
                 'radio',
             ])->default('text');
             $table->timestamps();
