@@ -14,8 +14,8 @@ return new class extends Migration
     public function up()
     {
         Schema::table('forms', function (Blueprint $table) {
-            $table->text('success_message')->nullable()->after('deadline');
-            $table->text('failure_message')->nullable()->after('deadline');
+            $table->text('success_message')->nullable()->after('socials');
+            $table->text('failure_message')->nullable()->after('success_message');
         });
     }
 
