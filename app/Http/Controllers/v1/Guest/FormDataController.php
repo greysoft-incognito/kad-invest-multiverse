@@ -78,6 +78,8 @@ class FormDataController extends Controller
         $validation_rules = $form->fields->mapWithKeys(function($field, $key) {
             if ($field->type === 'number') {
                 $rules[] = 'numeric';
+            } elseif ($field->type === 'select') {
+                $rules[] = 'array';
             } else {
                 $rules[] = 'string';
             }
@@ -93,9 +95,6 @@ class FormDataController extends Controller
             }
             if ($field->type === 'url') {
                 $rules[] = 'url';
-            }
-            if ($field->type === 'checkbox') {
-                $rules[] = 'array';
             }
             if ($field->type !== 'date') {
                 if ($field->min) {
