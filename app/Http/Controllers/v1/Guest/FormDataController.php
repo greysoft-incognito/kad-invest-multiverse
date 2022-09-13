@@ -94,6 +94,9 @@ class FormDataController extends Controller
             if ($field->type === 'url') {
                 $rules[] = 'url';
             }
+            if ($field->type === 'checkbox') {
+                $rules[] = 'array';
+            }
             if ($field->type !== 'date') {
                 if ($field->min) {
                     $rules[] = "min:$field->min";
