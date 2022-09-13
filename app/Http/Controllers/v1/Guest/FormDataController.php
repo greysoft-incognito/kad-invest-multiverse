@@ -78,7 +78,7 @@ class FormDataController extends Controller
         $validation_rules = $form->fields->mapWithKeys(function($field, $key) {
             if ($field->type === 'number') {
                 $rules[] = 'numeric';
-            } elseif ($field->type === 'select') {
+            } elseif ($field->type === 'multiple') {
                 $rules[] = 'array';
             } else {
                 $rules[] = 'string';
