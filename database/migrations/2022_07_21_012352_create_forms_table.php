@@ -24,8 +24,6 @@ return new class extends Migration
             $table->string('banner_title')->nullable();
             $table->text('banner_info')->fullText()->nullable();
             $table->json('socials')->nullable();
-            $table->text('success_message')->nullable();
-            $table->text('failure_message')->nullable();
             $table->timestamp('deadline')->nullable();
             $table->string('template')->default('default');
             $table->timestamps();
