@@ -64,8 +64,8 @@ class FormSubmitedSuccessfully extends Notification //implements ShouldQueue
         $qr_code = $n->id;
         $message = [
             'name' => $this->name,
-            'cta' => ['qrcode' => $qr_code],
-            'message_line1' => __($n->form->success_message, [
+            'cta' => str($n->form->success_message)->contains(':qrcode') ? ['qrcode' => $qr_code] : [],
+            'message_line1' => __(str($n->form->success_message)->remove(':qrcode', false)->toString(), [
                 'fullname' => $this->name, 
                 'qrcode' => $qr_code,
                 'form' => $n->form->title,

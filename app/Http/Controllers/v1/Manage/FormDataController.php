@@ -24,7 +24,7 @@ class FormDataController extends Controller
     public function index(Request $request, Form $form)
     {
         \Gate::authorize('usable', 'formdata.list');
-        $forms = $form->data()->paginate($request->get('limit', 30));
+        $forms = $form->data()->paginate($request->get('limit', 30))->withQueryString();
 
         return (new FormDataCollection($forms))->additional([
             'message' => HttpStatus::message(HttpStatus::OK),
@@ -42,7 +42,7 @@ class FormDataController extends Controller
     public function all(Request $request)
     {
         \Gate::authorize('usable', 'formdata.list');
-        $forms = GenericFormData::paginate($request->get('limit', 30));
+        $forms = GenericFormData::paginate($request->get('limit', 30))->withQueryString();
 
         return (new FormDataCollection($forms))->additional([
             'message' => HttpStatus::message(HttpStatus::OK),
@@ -69,7 +69,7 @@ class FormDataController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($form_id, $id)
     {
         \Gate::authorize('usable', 'formdata.show');
         $data = GenericFormData::whereId($id)->orWhere('key', $id)->firstOrFail();
