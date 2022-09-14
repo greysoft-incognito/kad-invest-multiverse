@@ -23,10 +23,10 @@ class ScanHistoryResource extends JsonResource
         $name_field = $form->fields()->where('name', 'like', '%name%')->first();
 
         $name = collect([
-            $fname_field ? $data[$fname_field->name] : '',
-            $lname_field ? $data[$lname_field->name] : '',
-            $fullname_field && !$fname_field && !$fname_field ? $data[$fullname_field->name] : '',
-            $name_field && !$fname_field && !$fname_field && !$fullname_field ? $data[$name_field->name] : '',
+            $fname_field ? $data[$fname_field->name]??$this->form_data->id : '',
+            $lname_field ? $data[$lname_field->name]??'' : '',
+            $fullname_field && !$fname_field && !$fname_field ? $data[$fullname_field->name]??"" : '',
+            $name_field && !$fname_field && !$fname_field && !$fullname_field ? $data[$name_field->name]??'' : '',
         ])->filter(fn($name) => $name !=='')->implode(' ');
 
         return [
