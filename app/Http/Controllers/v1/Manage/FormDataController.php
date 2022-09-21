@@ -136,12 +136,29 @@ class FormDataController extends Controller
                     ? $stat[0]
                     : $stat[1]??$stat[0];
 
-                return [$key => $form->data()
-                    ->where("data->{$stat[0]}", $stat[1]??'')
-                    ->orWhere("data->0->{$stat[0]}", $stat[1]??'')
-                    ->orWhere("data->1->{$stat[0]}", $stat[1]??'')
-                    ->orWhere("data->{$stat[0]}", 'like', '%'.($stat[1]??'').'%')
-                    ->count()];
+                $values = str($stat[1]??'')->explode('.');
+
+                if (str($stat[1]??'')->contains('.')) {
+                    $stat[2] = $values->get(1);
+                    $stat[3] = $values->get(2);
+                }
+
+                $stat[1] = $values->get(0);
+
+                $query = $form->data();
+                if ( isset($stat[3]) ) {
+                    $query->whereJsonContains("data->{$stat[0]}", [$stat[1], $stat[2], $stat[3]]);
+                } elseif ( isset($stat[2]) ) {
+                    $query->whereJsonContains("data->{$stat[0]}", [$stat[1], $stat[2]]);
+                } elseif ( $stat[1] ) {
+                    $query->whereJsonContains("data->{$stat[0]}", $stat[1]);
+
+                    if (!str($stat[1]??'')->contains('.')) {
+                        $query->whereJsonDoesntContain("data->{$stat[0]}", [$stat[1]]);
+                    }
+                }
+
+                return [$key => $query->count()];
             }))->merge(['total' => $form->data()->count()]);
         } else {
             $data = ['total' => $form->data()->count()];
