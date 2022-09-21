@@ -5,6 +5,7 @@ use App\Http\Controllers\v1\Guest\FormController;
 use App\Http\Controllers\v1\Guest\FormDataController;
 use App\Http\Controllers\v1\Guest\FormFieldController;
 use App\Http\Controllers\v1\HomeController;
+use App\Http\Controllers\v1\SpacesController;
 
 Route::name('home.')->group(function () {
     Route::get('/', function () {
@@ -23,4 +24,8 @@ Route::name('home.')->group(function () {
         Route::get('/get/verification/{action}/{task?}', 'manageFormFields')->name('verification.data');
         Route::post('/get/verification/{action}', 'manageFormFields')->middleware(['auth:sanctum']);
     });
+});
+
+Route::name('spaces.')->prefix('spaces')->controller(SpacesController::class)->group(function () {
+    Route::get('/', 'index')->name('index');
 });
