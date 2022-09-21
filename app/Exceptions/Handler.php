@@ -8,8 +8,8 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
+// use Spatie\MediaLibrary\MediaCollections\Exceptions\FileUnacceptableForCollection;
 use Illuminate\Validation\ValidationException;
-use Spatie\MediaLibrary\MediaCollections\Exceptions\FileUnacceptableForCollection;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -57,14 +57,14 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        $this->reportable(function (Request $request, Throwable $e) {
+        $this->reportable(function (Throwable $e) {
             //
         });
     }
 
     public function render($request, Throwable $e)
     {
-        if ($request->isXmlHttpRequest()) {
+        if ($request->isXmlHttpRequest() || request()->is('api/*')) {
             $line = method_exists($e, 'getFile') ? ' in '.$e->getFile() : '';
             $line .= method_exists($e, 'getLine') ? ' on line '.$e->getLine() : '';
             $getMessage = method_exists($e, 'getMessage') ? $e->getMessage().$line : 'An error occured'.$line;
@@ -97,11 +97,11 @@ class Handler extends ExceptionHandler
                     HttpStatus::message(HttpStatus::UNPROCESSABLE_ENTITY),
                     HttpStatus::UNPROCESSABLE_ENTITY
                 ),
-                $e instanceof FileUnacceptableForCollection => $this->renderException(
-                    __('You have selected an invalid image file.'),
-                    HttpStatus::UNPROCESSABLE_ENTITY,
-                    ['errors' => [collect($request->file())->keys()->first() => __('You have selected an invalid image file.')]]
-                ),
+                // $e instanceof FileUnacceptableForCollection => $this->renderException(
+                //     __('You have selected an invalid image file.'),
+                //     HttpStatus::UNPROCESSABLE_ENTITY,
+                //     ['errors' => [collect($request->file())->keys()->first() => __('You have selected an invalid image file.')]]
+                // ),
                 $e instanceof ThrottleRequestsException => $this->renderException(
                     HttpStatus::message(HttpStatus::TOO_MANY_REQUESTS),
                     HttpStatus::TOO_MANY_REQUESTS
@@ -120,6 +120,10 @@ class Handler extends ExceptionHandler
                 'message' => $msg,
                 'status' => 'error',
                 'status_code' => $code,
+            ])->merge($misc));
+        } else {
+            return $this->buildResponse(collect([
+                'message' => $msg,
             ])->merge($misc));
         }
     }

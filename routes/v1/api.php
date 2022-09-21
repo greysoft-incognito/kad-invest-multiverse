@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\ScanHistoryController;
+use App\Http\Controllers\v1\ScanHistoryController;
 use App\Http\Controllers\v1\Manage\FormController as SuFormController;
 use App\Http\Controllers\v1\Manage\FormDataController as SuFormDataController;
 use App\Http\Controllers\v1\Manage\FormFieldController as SuFormFieldController;
@@ -22,10 +22,10 @@ header('SameSite:  None');
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
+// dd(File::exists(base_path('routes/v1/api.php')));
 // Load Extra Routes
-if (file_exists(base_path('routes/v1'))) {
-    array_filter(File::files(base_path('routes/v1')), function ($file) {
+if (file_exists(base_path('routes/v1/api'))) {
+    array_filter(File::files(base_path('routes/v1/api')), function ($file) {
         if ($file->getExtension() === 'php') {
             require_once $file->getPathName();
         }
