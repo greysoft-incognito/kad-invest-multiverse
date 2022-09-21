@@ -151,7 +151,12 @@ class FormDataController extends Controller
                 } elseif ( isset($stat[2]) ) {
                     $query->whereJsonContains("data->{$stat[0]}", [$stat[1], $stat[2]]);
                 } elseif ( $stat[1] ) {
-                    $query->whereJsonContains("data->{$stat[0]}", $stat[1]);
+                    $query->where(function($q) use ($stat) {
+                        $q->whereJsonContains("data->{$stat[0]}", $stat[1]);
+                        $q->orWhere(function($q) use ($stat) {
+                            $q->whereJsonContains("data->{$stat[0]}", [$stat[1]]);
+                        });
+                    });
 
                     if (!str($stat[1]??'')->contains('.')) {
                         $query->whereJsonDoesntContain("data->{$stat[0]}", [$stat[1]]);
