@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\v1;
 
+use App\Services\AppInfo;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ScanHistoryResource extends JsonResource
@@ -14,7 +15,7 @@ class ScanHistoryResource extends JsonResource
      */
     public function toArray($request)
     {
-        $form = $this->form; 
+        $form = $this->form;
         $data = $this->form_data->data;
         $email_field = $form->fields()->where('type', 'email')->first();
         $fname_field = $form->fields()->where('name', 'like', '%firstname%')->orWhere('name', 'like', '%first_name%')->first();
@@ -39,5 +40,16 @@ class ScanHistoryResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
+    }
+
+    /**
+     * Get additional data that should be returned with the resource array.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function with($request)
+    {
+        return AppInfo::api();
     }
 }
