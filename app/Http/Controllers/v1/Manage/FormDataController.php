@@ -96,7 +96,7 @@ class FormDataController extends Controller
         ], [
             'qr.regex' => 'The QR code is invalid.',
         ]);
-        
+
         // Decode a regex string into an array
         preg_match('/^grey:multiverse:form=(\d+):data=(\d+)$/', $request->qr, $matches);
         $form_id = $matches[1];
@@ -132,11 +132,16 @@ class FormDataController extends Controller
             $data = collect(str($request->data)->explode(',')->mapWithKeys(function($value) use ($form) {
                 $stat = str($value)->explode(':');
 
-                $key = is_numeric($stat[1]??$stat[0]) || is_bool($stat[1]??$stat[0]) 
-                    ? $stat[0] 
+                $key = is_numeric($stat[1]??$stat[0]) || is_bool($stat[1]??$stat[0])
+                    ? $stat[0]
                     : $stat[1]??$stat[0];
 
-                return [$key => $form->data()->where("data->{$stat[0]}", $stat[1]??'')->count()];
+                return [$key => $form->data()
+                    ->where("data->{$stat[0]}", $stat[1]??'')
+                    ->orWhere("data->0->{$stat[0]}", $stat[1]??'')
+                    ->orWhere("data->1->{$stat[0]}", $stat[1]??'')
+                    ->orWhere("data->{$stat[0]}", 'like', '%'.($stat[1]??'').'%')
+                    ->count()];
             }))->merge(['total' => $form->data()->count()]);
         } else {
             $data = ['total' => $form->data()->count()];
