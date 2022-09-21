@@ -136,8 +136,6 @@ class FormDataController extends Controller
                     ? $stat[0]
                     : $stat[1]??$stat[0];
 
-                $field = $form->fields()->where('name', $key)->first();
-
                 $values = str($stat[1]??'')->explode('.');
 
                 if (str($stat[1]??'')->contains('.')) {
@@ -153,6 +151,9 @@ class FormDataController extends Controller
                 } elseif ( isset($stat[2]) ) {
                     $query->whereJsonContains("data->{$stat[0]}", [$stat[1], $stat[2]]);
                 } elseif ( $stat[1] ) {
+
+                	$field = $form->fields()->where('name', $stat[0])->first();
+
                     if ($field && $field->type === 'multiple') {
                         $query->whereJsonDoesntContain("data->{$stat[0]}", $stat[1]);
                     } else {
