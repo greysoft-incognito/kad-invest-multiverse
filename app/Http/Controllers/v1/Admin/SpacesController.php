@@ -4,6 +4,7 @@ namespace App\Http\Controllers\v1\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\v1\SpaceCollection;
+use App\Http\Resources\v1\SpaceResource;
 use App\Models\v1\Space;
 use App\Services\HttpStatus;
 use Illuminate\Http\Request;
@@ -68,10 +69,10 @@ class SpacesController extends Controller
         $space->image = $request->image->store('spaces');
         $space->save();
 
-        return response()->json([
+        return (new SpaceResource($space))->additional([
             'message' => HttpStatus::message(HttpStatus::CREATED),
             'status' => 'success',
             'status_code' => HttpStatus::CREATED,
-        ], HttpStatus::CREATED);
+        ])->response()->setStatusCode(HttpStatus::CREATED);
     }
 }
