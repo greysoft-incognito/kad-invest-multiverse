@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\v1;
 
+use App\Http\Controllers\Controller;
 use App\Http\Resources\v1\ScanHistoryCollection;
 use App\Http\Resources\v1\ScanHistoryResource;
 use App\Models\v1\ScanHistory;
