@@ -64,7 +64,7 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $e)
     {
-        if ($request->isXmlHttpRequest()) {
+        if ($request->isXmlHttpRequest() || request()->is('api/*')) {
             $line = method_exists($e, 'getFile') ? ' in '.$e->getFile() : '';
             $line .= method_exists($e, 'getLine') ? ' on line '.$e->getLine() : '';
             $getMessage = method_exists($e, 'getMessage') ? $e->getMessage().$line : 'An error occured'.$line;
