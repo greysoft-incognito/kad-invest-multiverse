@@ -4,6 +4,7 @@ namespace App\Http\Resources\v1;
 
 use App\Services\AppInfo;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Gate;
 
 class SpaceResource extends JsonResource
 {
@@ -15,7 +16,26 @@ class SpaceResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        $response = Gate::inspect('can-do', ['spaces.list']);
+
+        return [
+            "id" => $this->id,
+            "name" => $this->name,
+            "size" => $this->size,
+            "info" => $this->info,
+            "price" => $this->price,
+            "image_url" => $this->images['image'],
+            "total_occupants" => $this->total_occupants,
+            "available_spots" => $this->available_spots,
+            $this->mergeWhen($response->allowed(), function () {
+                return [
+                    "reservations" => $this->reservations,
+                    "users" => $this->users,
+                ];
+            }),
+            "created_at" => $this->created_at,
+            "updated_at" => $this->updated_at,
+        ];
     }
 
     /**

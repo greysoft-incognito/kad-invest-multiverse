@@ -4,7 +4,6 @@ namespace App\Models\v1;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-use App\Services\Media;
 use App\Traits\Permissions;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,10 +12,11 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use ToneflixCode\LaravelFileable\Traits\Fileable;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, Permissions;
+    use HasApiTokens, HasFactory, Notifiable, Permissions, Fileable;
 
     /**
      * The attributes that are mass assignable.
@@ -51,15 +51,9 @@ class User extends Authenticatable
         'privileges' => 'array',
     ];
 
-    protected static function booted()
+    public function registerFileable()
     {
-        static::saving(function ($user) {
-            $user->image = (new Media)->save('avatar', 'image', $user->image);
-        });
-
-        static::deleted(function ($user) {
-            (new Media)->delete('avatar', $user->image);
-        });
+        $this->fileableLoader('image', 'avatar');
     }
 
     /**
@@ -70,7 +64,7 @@ class User extends Authenticatable
     protected function avatar(): Attribute
     {
         return Attribute::make(
-            get: fn ($value, $attributes) => (new Media)->image('avatar', $attributes['image']),
+            get: fn () => $this->images['image'],
         );
     }
 

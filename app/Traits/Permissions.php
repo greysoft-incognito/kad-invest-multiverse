@@ -41,6 +41,13 @@ trait Permissions
             'subscriptions',
             'transactions',
             'configuration',
+
+            'spaces',
+            'spaces.list',
+            'spaces.show',
+            'spaces.create',
+            'spaces.update',
+            'spaces.delete',
         ],
         'manager' => [
             'users.list',
@@ -65,6 +72,13 @@ trait Permissions
             'dashboard',
             'subscriptions',
             'transactions',
+
+            'spaces',
+            'spaces.list',
+            'spaces.show',
+            'spaces.create',
+            'spaces.update',
+            'spaces.delete',
         ],
         'reviewer' => [
             'form.list',
@@ -78,6 +92,9 @@ trait Permissions
             'formdata.show',
 
             'dashboard',
+
+            'spaces.list',
+            'spaces.show',
         ],
     ];
 

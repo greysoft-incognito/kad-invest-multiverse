@@ -28,4 +28,5 @@ Route::name('home.')->group(function () {
 
 Route::name('spaces.')->prefix('spaces')->controller(SpacesController::class)->group(function () {
     Route::get('/', 'index')->name('index');
+    Route::get('/{space}', 'show')->name('show');
 });

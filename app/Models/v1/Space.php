@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use ToneflixCode\LaravelFileable\Traits\Fileable;
 
 class Space extends Model
 {
-    use HasFactory;
+    use HasFactory, Fileable;
 
     protected $fillable = [
         'name',
@@ -24,6 +25,15 @@ class Space extends Model
     protected $casts = [
         'data' => 'array',
     ];
+
+    protected $attributes = [
+        'size' => '0',
+    ];
+
+    public function registerFileable()
+    {
+        $this->fileableLoader('image', 'default');
+    }
 
     /**
      * Get all of the reservations for the Space
@@ -42,7 +52,7 @@ class Space extends Model
      */
     public function users(): HasManyThrough
     {
-        return $this->hasManyThrough(User::class, Reservation::class);
+        return $this->hasManyThrough(User::class, Reservation::class, 'id', 'id', 'id', 'user_id');
     }
 
     /**
