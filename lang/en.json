@@ -1,3 +1,5 @@
 {
-    "Sorry, this space is already booked up": "Sorry, this boot is already booked up"
+    "Sorry, this space is already booked up": "Sorry, this boot is already booked up",
+    "Some spaces you selected are no longer available": "Some boots you selected are no longer available",
+    "spaces": "boots"
 }

@@ -24,7 +24,7 @@ Route::get('/', function () {
     ];
 });
 
-Route::get('/{type}/data/qr/{id}', function ($type = 'form', $id) {
+Route::get('/{type}/data/qr/{id}', function ($type, $id) {
     // header('Content-Type: image/png');
     if ($type === 'form') {
         $data = GenericFormData::findOrFail($id);
