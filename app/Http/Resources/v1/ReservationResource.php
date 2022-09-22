@@ -14,7 +14,7 @@ class ReservationResource extends JsonResource
      */
     public function toArray($request)
     {
-        $time_left = $this->created_at->diffInRealHours(now()->subHours(24)->toDateTimeString());
+        $time_left = $this->created_at->diffForHumans(now()->subHours(24)->toDateTimeString());
         $user = $this->user_type === 'guest' ? $this->guest : $this->user;
 
         return [
