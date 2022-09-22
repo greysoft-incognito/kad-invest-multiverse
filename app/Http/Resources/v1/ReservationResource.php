@@ -21,7 +21,7 @@ class ReservationResource extends JsonResource
             'id' => $this->id,
             'user_id' => $this->user_id,
             'space_id' => $this->space_id,
-            'selected_space' => $this->space->name,
+            'selected_space' => $this->space ? $this->space->name : '',
             'name' => $user->fullname,
             'email' => $user->email,
             'phone' => $user->phone,
@@ -45,7 +45,7 @@ class ReservationResource extends JsonResource
                 'end_date' => 'End Date',
                 'status' => 'Status',
                 'paid' => 'Paid',
-                'time_left' => 'Time Left',
+                'time_left' => 'Time Left (Hours)',
                 'date' => 'Reservation Date',
             ])->map(function($value, $key) {
                 return [
