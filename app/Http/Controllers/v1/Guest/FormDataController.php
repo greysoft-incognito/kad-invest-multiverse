@@ -70,7 +70,7 @@ class FormDataController extends Controller
                 return ["data.$field->name.required" => $field->custom_error];
             }
         })->toArray();
-        
+
         $custom_attributes = $form->fields->mapWithKeys(function($field, $key) {
             return ['data.'.$field->name => $field->label];
         })->toArray();
@@ -104,7 +104,7 @@ class FormDataController extends Controller
                     $rules[] = "min:$field->max";
                 }
             }
-            
+
             if ($field->type === 'email') {
                 $rules[] = 'email';
             }
@@ -113,13 +113,13 @@ class FormDataController extends Controller
             }
             return ['data.'.$field->name => $rules];
         })->toArray();
-        
+
         foreach ($request->get('data', []) as $key => $value) {
             if ($form->fields->pluck('name')->doesntContain($key)) {
                 $errors->push([$key => "$key is not a valid input."]);
             }
             if ($form->fields->pluck('name')->contains($key)) {
-                
+
                 $field = $form->fields->firstWhere('name', $key);
 
                 if ($field->required && $field->type === 'date' && $field->compare) {
@@ -129,11 +129,15 @@ class FormDataController extends Controller
                     $compare = ($parseCompare !== false) ? CarbonImmutable::parse($parseCompare) : new Carbon($field->compare);
                     $compare = $compare->format('jS M, Y');
                     $diff = $date->diffInYears($compare);
-                    
+
                     if ($field->min && $diff < $field->min) {
                         $errors->push(['data.'.$key => __("The minimum :1 requirement for this application is :0, your :2 puts you at :3 by :4.", [$field->max, $field->alias, $field->label, $diff, $compare])]);
                     }
-                    
+
+                    if ($field->key && GenericFormData::whereJsonContains("data->{$key}", $$value)->exists()) {
+                        $errors->push(['data.'.$key => __("The :0 has already been taken.", [$field->label])]);
+                    }
+
                     if ($field->max && $diff > $field->max) {
                         $errors->push(['data.'.$key => __("The :1 limit for this application is :0, your :2 puts you at :3 by :4.", [$field->max, $field->alias, $field->label, $diff, $compare])]);
                     }
@@ -153,7 +157,7 @@ class FormDataController extends Controller
 
         $key = $form->fields->firstWhere('key', true)->name ?? $form->fields->first()->name;
         $data = $request->get('data');
-        
+
         if (!$data) {
             throw ValidationException::withMessages(['data' => 'No data passed']);
         }
