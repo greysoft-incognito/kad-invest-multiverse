@@ -31,6 +31,8 @@ class ReservationController extends Controller
             'email' => ['required', 'string', 'email', 'max:255'],// 'unique:users'],
             'phone' => config('settings.verify_phone', false) ? "required|$phone_val" : 'nullable|string|max:255|unique:users',
             'company' => 'required|string|max:120',
+            'start_date' => 'sometimes|date',
+            'end_date' => 'sometimes|date|after_or_equal:start_date',
         ]);
 
         $name = str($request->name ?? $request->username)->explode(' ');
@@ -46,43 +48,58 @@ class ReservationController extends Controller
         );
 
         event(new Registered($user));
-        return $this->reserveNow($request, $space, $user);
+        return $this->reserveNow($request, $space, $user, 'guest');
     }
 
     public function store(Request $request, Space $space)
     {
+        $request->validate([
+            'start_date' => 'sometimes|date',
+            'end_date' => 'sometimes|date|after_or_equal:start_date',
+        ]);
+
         if ($space->available_spots <= 0) {
             $error = __('This space is already booked up');
             return $this->buildResponse([
                 'message' => $error,
                 'status' => 'error',
-                'status_code' => HttpStatus::BAD_REQUEST,
+                'status_code' => HttpStatus::UNPROCESSABLE_ENTITY,
             ]);
         }
 
         $user = Auth::user();
-        return $this->reserveNow($request, $space, $user);
+        return $this->reserveNow($request, $space, $user, 'user');
     }
 
-    protected function reserveNow(Request $request, Space $space, $user)
+    protected function reserveNow(Request $request, Space $space, $user, $user_type)
     {
         if ($request->has('space_ids') && is_array($request->space_ids)) {
-            $reservations = collect($request->space_ids)->filter(function ($space) {
-                return $space != null;
-            })->map(function ($space_id) use ($user, $request) {
-                $space = Space::find($space_id);
+            $spaces = Space::whereIn('id', $request->space_ids)->get();
+            $is_available = $spaces->mapWithKeys(function($space, $key) {
+                return [$space->id => !$space->is_available ? __(':name is no longer available', ['name' => $space->name]) : true];
+            });
 
+            if (($errors = $is_available->filter(fn($value) => $value !== true))->count() > 0) {
+                $error = __('Some spaces you selected are no longer available');
+                return $this->buildResponse([
+                    'message' => $error,
+                    'status' => 'error',
+                    'status_code' => HttpStatus::UNPROCESSABLE_ENTITY,
+                ], ['errors' => $errors]);
+            }
+
+            $reservations = $spaces->map(function ($space) use ($user, $request, $user_type) {
                 $reservation = $space->reservations()->create([
                     'name' => $request->name,
                     'user_id' => $user->id,
-                    'user_type' => 'user',
+                    'user_type' => $user_type,
                     'start_date' => $request->start_date ?? null,
                     'end_date' => $request->end_date ?? null,
                 ]);
 
                 $reference = config('settings.trx_prefix', 'TRX-').$this->generate_string(20, 3);
 
-                $reservation->transactions()->create([
+                return $reservation->transactions()->create([
                     'user_id' => $user->id,
                     'amount' => $space->price,
                     'due' => $space->price,
