@@ -18,6 +18,7 @@ class GenericFormData extends Model
      */
     protected $casts = [
         'data' => 'array',
+        'scan_date' => 'datetime',
     ];
 
     /**
@@ -26,6 +27,7 @@ class GenericFormData extends Model
      * @var array
      */
     protected $fillable = [
+        'scan_date',
         'form_id',
         'data',
         'key',
@@ -66,7 +68,7 @@ class GenericFormData extends Model
             $fullname_field && !$fname_field && !$fname_field ? $this->data[$fullname_field->name] : '',
             $name_field && !$fname_field && !$fname_field && !$fullname_field ? $this->data[$name_field->name] : '',
         ])->filter(fn($name) => $name !=='')->implode(' ');
-            
+
         // Return email address and name...
         return [$this->data[$email_field->name]??0 => $name];
     }

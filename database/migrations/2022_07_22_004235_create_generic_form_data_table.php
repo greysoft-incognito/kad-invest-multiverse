@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('form_id')->constrained('forms', 'id')->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('key')->index();
             $table->json('data')->nullable();
+            $table->timestamp('scan_date')->nullable();
             $table->timestamps();
         });
     }
