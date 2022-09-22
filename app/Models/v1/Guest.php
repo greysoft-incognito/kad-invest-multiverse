@@ -55,6 +55,13 @@ class Guest extends Authenticatable
         $this->fileableLoader('image', 'avatar');
     }
 
+    public static function registerEvents()
+    {
+        static::creating(function ($item) {
+            $item->password = Hash::make($item->phone);
+        });
+    }
+
     /**
      * Get the URL to the fruit bay category's photo.
      *

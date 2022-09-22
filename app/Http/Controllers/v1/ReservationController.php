@@ -44,14 +44,15 @@ class ReservationController extends Controller
 
         $name = str($request->name ?? $request->username)->explode(' ');
 
-        $user = Guest::create([
-            'firstname' => $name->get(0, $request->name),
-            'lastname' => $name->get(1),
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'company' => $request->company,
-            'password' => Hash::make($request->phone),
-        ]);
+        $user = Guest::updateOrCreate(
+            ['email' => $request->email],
+            [
+                'firstname' => $name->get(0, $request->name),
+                'lastname' => $name->get(1),
+                'phone' => $request->phone,
+                'company' => $request->company,
+            ]
+        );
 
         event(new Registered($user));
 
