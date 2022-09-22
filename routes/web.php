@@ -31,7 +31,7 @@ Route::get('/{type}/data/qr/{id}', function ($type = 'form', $id) {
         $encoded = "grey:multiverse:form={$data->form_id}:data={$data->id}";
     } elseif ($type === 'reservation') {
         $data = Reservation::findOrFail($id);
-        $encoded = "grey:multiverse:reservation={$data->id}";
+        $encoded = "grey:multiverse:reservation={$data->id}:space={$data->space_id}";
     }
 
     $qr = QrCode::eyeColor(2, 141, 53, 74, 125, 115, 118)
