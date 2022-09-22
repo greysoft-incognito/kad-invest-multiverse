@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onUpdate('cascade')->onDelete('cascade');
+            $table->integer('user_id')->index();
             $table->morphs('transactable');
             $table->string('reference')->nullable();
             $table->string('method')->nullable();
