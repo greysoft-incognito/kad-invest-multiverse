@@ -129,7 +129,6 @@ class FormDataController extends Controller
         \Gate::authorize('usable', 'formdata.stats');
 
         if ($request->data) {
-
           	$request_data = str($request->data)->explode(',');
             $data = $request_data->mapWithKeys(function($value) use ($form, $request_data) {
                 $stat = str($value)->explode(':');
@@ -154,7 +153,7 @@ class FormDataController extends Controller
                     $query->whereJsonContains("data->{$stat[0]}", [$stat[1], $stat[2]]);
                 } elseif ( $stat[1] ) {
 
-                	$field = $form->fields()->where('name', $stat[0])->first();
+                    $field = $form->fields()->where('name', $stat[0])->first();
 
                     if ($field && $field->type === 'multiple') {
                         $query->whereJsonContains("data->{$stat[0]}", $stat[1]);
