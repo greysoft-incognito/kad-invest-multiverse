@@ -2,15 +2,15 @@
 
 namespace App\Models\v1;
 
-use App\Services\Media;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use ToneflixCode\LaravelFileable\Traits\Fileable;
 
 class Form extends Model
 {
-    use HasFactory;
+    use HasFactory, Fileable;
 
     /**
      * The attributes that should be cast.
@@ -32,21 +32,19 @@ class Form extends Model
         'logo_url'
     ];
 
-    protected static function booted()
+    public function registerFileable()
+    {
+        $this->fileableLoader([
+            'banner' => 'banner',
+            'logo' => 'logo',
+        ]);
+    }
+
+    public static function registerEvents()
     {
         static::creating(function ($item) {
             $slug = str($item->title)->slug();
             $item->slug = (string) self::whereSlug($slug)->exists() ? $slug->append(rand()) : $slug;
-        });
-
-        static::saving(function ($item) {
-            $item->banner = (new Media)->save('banner', 'banner', $item->banner);
-            $item->logo = (new Media)->save('logo', 'logo', $item->logo);
-        });
-
-        static::deleted(function ($item) {
-            (new Media)->delete('banner', $item->banner);
-            (new Media)->delete('logo', $item->logo);
         });
     }
 
@@ -58,7 +56,7 @@ class Form extends Model
     protected function bannerUrl(): Attribute
     {
         return Attribute::make(
-            get: fn () => (new Media)->image('banner', $this->banner),
+            get: fn () => $this->images['banner'],
         );
     }
 
@@ -100,7 +98,7 @@ class Form extends Model
     protected function logoUrl(): Attribute
     {
         return Attribute::make(
-            get: fn () => (new Media)->image('logo', $this->logo),
+            get: fn () => $this->images['logo'],
         );
     }
 

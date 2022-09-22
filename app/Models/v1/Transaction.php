@@ -11,9 +11,14 @@ class Transaction extends Model
     use HasFactory;
 
     protected $fillable = [
+        'reference',
+        'user_id',
+        'method',
         'amount',
         'status',
         'data',
+        'tax',
+        'due',
     ];
 
     protected $casts = [
@@ -28,6 +33,16 @@ class Transaction extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the user that owns the Transaction
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function guest(): BelongsTo
+    {
+        return $this->belongsTo(Guest::class);
     }
 
     /**

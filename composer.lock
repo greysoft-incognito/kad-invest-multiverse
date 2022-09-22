@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4ff0c24cbbf9264690ac27dae47fb059",
+    "content-hash": "013f2d44a895d382421e233b0197f3f0",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -5769,6 +5769,70 @@
                 "source": "https://github.com/tijsverkoyen/CssToInlineStyles/tree/2.2.5"
             },
             "time": "2022-09-12T13:28:28+00:00"
+        },
+        {
+            "name": "toneflix-code/laravel-fileable",
+            "version": "1.0.9",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/toneflix/laravel-fileable.git",
+                "reference": "cdb0749983cf58077eb8040d67f4267ed888b322"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/toneflix/laravel-fileable/zipball/cdb0749983cf58077eb8040d67f4267ed888b322",
+                "reference": "cdb0749983cf58077eb8040d67f4267ed888b322",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/filesystem": "^5.5|~6|~7|~8|~9",
+                "illuminate/support": "^8.0|^9.0",
+                "intervention/image": "^2.7",
+                "intervention/imagecache": "^2.5",
+                "php": "^8.0|^8.1"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^7.0",
+                "phpunit/phpunit": "^9.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "ToneflixCode\\LaravelFileable\\FileableServiceProvider"
+                    ],
+                    "aliases": {
+                        "LaravelFileable": "ToneflixCode\\LaravelFileable\\Facades\\Fileable"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "ToneflixCode\\LaravelFileable\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Toneflix Code",
+                    "email": "code@toneflix.com.ng",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Laravel Fileable exposes methods that make handling file upload with Laravel filesystem even easier, it also exposes a trait that automatically handles file uploads for you.",
+            "homepage": "https://github.com/toneflix/laravel-fileable",
+            "keywords": [
+                "laravel-fileable",
+                "toneflix-code"
+            ],
+            "support": {
+                "issues": "https://github.com/toneflix/laravel-fileable/issues",
+                "source": "https://github.com/toneflix/laravel-fileable/tree/1.0.9"
+            },
+            "time": "2022-09-06T14:26:43+00:00"
         },
         {
             "name": "twilio/sdk",

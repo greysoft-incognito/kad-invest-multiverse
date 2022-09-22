@@ -4,6 +4,7 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\v1\SpaceCollection;
+use App\Http\Resources\v1\SpaceResource;
 use App\Models\v1\Space;
 use App\Services\HttpStatus;
 use Illuminate\Http\Request;
@@ -46,5 +47,14 @@ class SpacesController extends Controller
             'status' => 'success',
             'status_code' => HttpStatus::OK,
         ], $request->search ? ['total_results' => $query->count()] : []));
+    }
+
+    public function show(Request $request, Space $space)
+    {
+        return (new SpaceResource($space))->additional([
+            'message' => HttpStatus::message(HttpStatus::OK),
+            'status' => 'success',
+            'status_code' => HttpStatus::OK,
+        ]);
     }
 }

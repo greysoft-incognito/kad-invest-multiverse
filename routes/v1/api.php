@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\v1\Admin\ReservationController;
 use App\Http\Controllers\v1\ScanHistoryController;
 use App\Http\Controllers\v1\Manage\FormController as SuFormController;
 use App\Http\Controllers\v1\Manage\FormDataController as SuFormDataController;
@@ -11,7 +12,6 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 
 header('SameSite:  None');
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -58,7 +58,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::apiResource('form-fields/{form}', SuFormFieldController::class)
             ->parameters(['{form}' => 'field'])->except(['store', 'update', 'destroy']);
         Route::get('form-data/all', [SuFormDataController::class, 'all'])->name('all');
-        Route::post('form-data/qr', [SuFormDataController::class, 'decodeQr'])->name('decode.qr');
+        Route::post('qr/form-data', [SuFormDataController::class, 'decodeQr'])->name('decode.qr');
+        Route::post('qr/reservation-data', [ReservationController::class, 'decodeQr'])->name('decode.reservation.qr');
         Route::get('form-data/stats/{form}', [SuFormDataController::class, 'stats'])->name('stats');
         Route::apiResource('form-data/{form}', SuFormDataController::class)->parameters(['{form}' => 'id']);
     });

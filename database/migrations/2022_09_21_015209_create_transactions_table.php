@@ -23,7 +23,7 @@ return new class extends Migration
             $table->decimal('due')->default(0.00);
             $table->decimal('tax')->default(0.00);
             $table->decimal('discount')->default(0.00);
-            $table->enum('status', ['pending', 'completed'])->default('pending');
+            $table->enum('status', ['pending', 'paid', 'cancelled', 'failed'])->default('pending');
             $table->timestamps();
         });
     }

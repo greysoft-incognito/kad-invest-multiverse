@@ -173,7 +173,7 @@
                                                                                 <td style="font-family: sans-serif; font-size: 1.3em; vertical-align: top; border-radius: 5px; text-align: center; background-color: #fff;display: flex;"
                                                                                     valign="top" align="center"
                                                                                     bgcolor="#3498db">
-                                                                                    <img src="{{ route('form.data.qr', $cta['qrcode']) }}"
+                                                                                    <img src="{{ route('form.data.qr', ['form', $cta['qrcode']]) }}"
                                                                                         alt="QR Code" style="width: 150px;">
                                                                                 </td>
                                                                             @endisset

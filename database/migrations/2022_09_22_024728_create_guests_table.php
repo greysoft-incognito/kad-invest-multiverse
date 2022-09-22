@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('guests', function (Blueprint $table) {
             $table->id();
             $table->string('firstname');
             $table->string('lastname')->nullable();
@@ -22,7 +22,6 @@ return new class extends Migration
             $table->string('phone')->unique()->nullable();
             $table->string('company')->nullable();
             $table->json('access_data')->nullable();
-            $table->json('privileges')->nullable();
             $table->string('password');
             $table->string('email_verify_code')->nullable();
             $table->string('phone_verify_code')->nullable();
@@ -41,6 +40,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('guests');
     }
 };
