@@ -46,7 +46,7 @@ class ReservationResource extends JsonResource
                 'status' => 'Status',
                 'paid' => 'Paid',
                 'time_left' => 'Time Left',
-                'created_at' => 'Reservation Date',
+                'date' => 'Reservation Date',
             ])->map(function($value, $key) {
                 return [
                     'id' => $key,
@@ -54,6 +54,7 @@ class ReservationResource extends JsonResource
                     'label' => $value,
                 ];
             })->values(),
+            'date' => $this->when($this->created_at, $this->created_at->format('Y-m-d H:i:s')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
