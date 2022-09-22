@@ -17,11 +17,11 @@ return new class extends Migration
             $table->id();
             $table->string('name')->nullable();
             $table->string('size')->nullable();
-            $table->string('info')->fulltext()->nullable();
+            $table->text('info')->fulltext()->nullable();
             $table->string('image')->nullable();
-            $table->double('price')->default(0.00);
+            $table->decimal('price')->default(0.00);
             $table->json('data')->nullable();
-            $table->integer('max_uccupants')->default(1);
+            $table->integer('max_occupants')->default(1);
             $table->timestamps();
         });
     }

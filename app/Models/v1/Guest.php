@@ -2,21 +2,18 @@
 
 namespace App\Models\v1;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-
-use App\Traits\Permissions;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use ToneflixCode\LaravelFileable\Traits\Fileable;
 
-class User extends Authenticatable
+class Guest extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, Permissions, Fileable;
+    use HasApiTokens, HasFactory, Notifiable, Fileable;
 
     /**
      * The attributes that are mass assignable.
@@ -81,17 +78,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get all of the scan_history for the User
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function scan_history(): HasMany
-    {
-        return $this->hasMany(ScanHistory::class);
-    }
-
-    /**
-     * Get all of the USER's Reservations.
+     * Get all of the guest's Reservations.
      */
     public function reservations(): HasMany
     {
@@ -99,7 +86,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get all of the USER's TRANSACTIONS.
+     * Get all of the guest's TRANSACTIONS.
      */
     public function transactions(): MorphMany
     {

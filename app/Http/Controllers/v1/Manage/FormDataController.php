@@ -129,7 +129,6 @@ class FormDataController extends Controller
         \Gate::authorize('usable', 'formdata.stats');
 
         if ($request->data) {
-          	
           	$request_data = str($request->data)->explode(',');
             $data = $request_data->mapWithKeys(function($value) use ($form, $request_data) {
                 $stat = str($value)->explode(':');
@@ -162,7 +161,7 @@ class FormDataController extends Controller
                         $query->whereJsonContains("data->{$stat[0]}", $stat[1]);
                         $query->whereJsonDoesntContain("data->{$stat[0]}", [$stat[1]]);
                     }
-                    
+
                   	$others = $request_data->filter(fn($rd)=> $rd !== "{$stat[0]}:{$stat[1]}")->toArray();
                     foreach($others as $other) {
                       $query->whereJsonDoesntContain("data->{$stat[0]}", str_ireplace("{$stat[0]}:", '', $other));

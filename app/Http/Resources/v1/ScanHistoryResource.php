@@ -35,7 +35,7 @@ class ScanHistoryResource extends JsonResource
             'form_id' => $this->form_id,
             'form_data_id' => $this->form_data_id,
             'name' => $name,
-            'qr' => route('form.data.qr', $this->form_data_id),
+            'qr' => route('form.data.qr', ['form', $this->form_data_id]),
             'email' => $data[$email_field->name],
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

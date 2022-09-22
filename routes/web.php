@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\v1\GenericFormData;
+use App\Models\v1\Reservation;
 use App\Services\AppInfo;
 use App\Services\Media;
 use Illuminate\Support\Facades\Response;
@@ -23,8 +24,16 @@ Route::get('/', function () {
     ];
 });
 
-Route::get('/forms/data/qr/{form}', function (GenericFormData $form) {
+Route::get('/{type}/data/qr/{id}', function ($type = 'form', $id) {
     // header('Content-Type: image/png');
+    if ($type === 'form') {
+        $data = GenericFormData::findOrFail($id);
+        $encoded = "grey:multiverse:form={$data->form_id}:data={$data->id}";
+    } elseif ($type === 'reservation') {
+        $data = Reservation::findOrFail($id);
+        $encoded = "grey:multiverse:reservation={$data->id}";
+    }
+
     $qr = QrCode::eyeColor(2, 141, 53, 74, 125, 115, 118)
         ->format('png')
         ->size(400)
@@ -33,6 +42,6 @@ Route::get('/forms/data/qr/{form}', function (GenericFormData $form) {
         ->style('dot', 0.99)
         // ->errorCorrection('M')
         ->eyeColor(1, 125, 115, 118, 141, 53, 74)
-        ->generate("grey:multiverse:form={$form->form_id}:data={$form->id}");
+        ->generate($encoded);
     Response::make($qr)->header('Content-Type', 'image/png')->send();
 })->name('form.data.qr');
