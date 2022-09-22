@@ -48,6 +48,12 @@ trait Permissions
             'spaces.create',
             'spaces.update',
             'spaces.delete',
+
+            'reservation.list',
+            'reservation.show',
+            'reservation.create',
+            'reservation.update',
+            'reservation.delete',
         ],
         'manager' => [
             'users.list',
@@ -79,6 +85,12 @@ trait Permissions
             'spaces.create',
             'spaces.update',
             'spaces.delete',
+
+            'reservation.list',
+            'reservation.show',
+            'reservation.create',
+            'reservation.update',
+            'reservation.delete',
         ],
         'reviewer' => [
             'form.list',
@@ -95,6 +107,9 @@ trait Permissions
 
             'spaces.list',
             'spaces.show',
+
+            'reservation.list',
+            'reservation.show',
         ],
     ];
 

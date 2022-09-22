@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('space_id')->constrained('spaces')->onDelete('cascade');
             $table->integer('user_id')->index();
             $table->string('user_type')->default('user');
+            $table->timestamp('scan_date')->nullable();
             $table->timestamp('start_date')->nullable();
             $table->timestamp('end_date')->nullable();
             $table->timestamps();

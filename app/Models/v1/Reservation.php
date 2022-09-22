@@ -16,8 +16,15 @@ class Reservation extends Model
         'space_id',
         'user_id',
         'user_type',
+        'scan_date',
         'start_date',
         'end_date',
+    ];
+
+    protected $casts = [
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
+        'scan_date' => 'datetime',
     ];
 
     /**

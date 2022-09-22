@@ -20,6 +20,7 @@ class ReservationController extends Controller
      */
     public function index(Request $request, Space $space)
     {
+        $this->authorize('can-do', ['reservation.list']);
         $query = $space->reservations();
         // Search and filter columns
         if ($request->search) {
@@ -58,6 +59,7 @@ class ReservationController extends Controller
      */
     public function all(Request $request, $status = 'reserved')
     {
+        $this->authorize('can-do', ['reservation.list']);
         $query = Reservation::query();
 
         if (in_array($status, ['reserved', 'paid', 'pending', 'cancelled', 'failed'])) {
@@ -105,7 +107,43 @@ class ReservationController extends Controller
 
     public function show(Request $request, Space $space, $reservation)
     {
+        $this->authorize('can-do', ['reservation.show']);
         $reservation = $space->reservations()->where('id', $reservation)->firstOrFail();
+
+        return (new ReservationResource($reservation))->additional([
+            'message' => HttpStatus::message(HttpStatus::OK),
+            'status' => 'success',
+            'status_code' => HttpStatus::OK,
+        ]);
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function decodeQr(Request $request)
+    {
+        $this->authorize('can-do', ['reservation.show']);
+        // Use regex to extract the form_id and data_id parts of the following string 'grey:multiverse:form=1:data=23'
+        $this->validate($request, [
+            'qr' => 'required|regex:/^grey:multiverse:reservation=(\d+):space=(\d+)$/',
+        ], [
+            'qr.regex' => 'The QR code is invalid.',
+        ]);
+
+        // Decode a regex string into an array
+        preg_match('/^grey:multiverse:reservation=(\d+):space=(\d+)$/', $request->qr, $matches);
+        $reservation_id = $matches[1];
+        $space_id = $matches[2];
+
+        $space = Space::whereId($space_id)->firstOrFail();
+        $reservation = $space->reservations()->where('id', $reservation_id)->firstOrFail();
+
+        // save this scan date
+        $reservation->scan_date = now();
+        $reservation->save();
 
         return (new ReservationResource($reservation))->additional([
             'message' => HttpStatus::message(HttpStatus::OK),
@@ -116,6 +154,7 @@ class ReservationController extends Controller
 
     public function status(Request $request, Space $space, $reservation)
     {
+        $this->authorize('can-do', ['reservation.update']);
         $reservation = $space->all_reservations()->where('id', $reservation)->firstOrFail();
 
         $this->authorize('can-do', ['spaces.update']);
@@ -147,7 +186,7 @@ class ReservationController extends Controller
      */
     public function destroy(Request $request, $id = null)
     {
-        $this->authorize('can-do', ['spaces.delete']);
+        $this->authorize('can-do', ['reservation.delete']);
         if ($request->items) {
             $count = collect($request->items)->map(function ($item){
                 $item = Reservation::find($item);
