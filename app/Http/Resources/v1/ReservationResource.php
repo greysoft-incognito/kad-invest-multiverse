@@ -35,7 +35,7 @@ class ReservationResource extends JsonResource
             'time_left' => $time_left > 0 ? $time_left : 0,
             'user_type' => $this->user_type,
             'user' => $user,
-            'fields' => [
+            'fields' => collect([
                 'selected_space' => 'Selected Space',
                 'name' => 'Name',
                 'email' => 'Email',
@@ -47,7 +47,13 @@ class ReservationResource extends JsonResource
                 'paid' => 'Paid',
                 'time_left' => 'Time Left',
                 'created_at' => 'Reservation Date',
-            ],
+            ])->map(function($value, $key) {
+                return [
+                    'id' => $key,
+                    'name' => $key,
+                    'label' => $value,
+                ];
+            })->values(),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
