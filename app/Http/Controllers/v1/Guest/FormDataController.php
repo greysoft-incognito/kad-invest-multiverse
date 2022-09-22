@@ -134,13 +134,15 @@ class FormDataController extends Controller
                         $errors->push(['data.'.$key => __("The minimum :1 requirement for this application is :0, your :2 puts you at :3 by :4.", [$field->max, $field->alias, $field->label, $diff, $compare])]);
                     }
 
-                    if ($field->key && GenericFormData::whereJsonContains("data->{$key}", $$value)->exists()) {
-                        $errors->push(['data.'.$key => __("The :0 has already been taken.", [$field->label])]);
-                    }
-
                     if ($field->max && $diff > $field->max) {
                         $errors->push(['data.'.$key => __("The :1 limit for this application is :0, your :2 puts you at :3 by :4.", [$field->max, $field->alias, $field->label, $diff, $compare])]);
                     }
+                }
+
+                if ($field->key) {
+                }
+                if ($field->key && GenericFormData::whereJsonContains("data->{$key}", $value)->exists()) {
+                    $errors->push(['data.'.$key => __("The :0 has already been taken.", [$field->label])]);
                 }
             }
         }
