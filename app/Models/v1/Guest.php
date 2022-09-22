@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 use ToneflixCode\LaravelFileable\Traits\Fileable;
 
@@ -53,6 +54,13 @@ class Guest extends Authenticatable
     public function registerFileable()
     {
         $this->fileableLoader('image', 'avatar');
+    }
+
+    public static function registerEvents()
+    {
+        static::creating(function ($item) {
+            $item->password = Hash::make($item->phone);
+        });
     }
 
     /**
