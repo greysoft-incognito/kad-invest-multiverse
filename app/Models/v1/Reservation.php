@@ -94,6 +94,16 @@ class Reservation extends Model
         );
     }
 
+    public function transaction(): Attribute
+    {
+        return new Attribute(
+            get: function() {
+                $user = $this->user_type === 'guest' ? $this->guest : $this->user;
+                return $user ? $this->transactions()->whereUserId($user->id)->latest()->first() : null;
+            },
+        );
+    }
+
     /**
      * Get all of the reservation's TRANSACTIONS.
      */
