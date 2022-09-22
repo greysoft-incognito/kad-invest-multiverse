@@ -37,7 +37,7 @@ class ReservationController extends Controller
 
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:255'],// 'unique:users'],
             'phone' => config('settings.verify_phone', false) ? "required|$phone_val" : 'nullable|string|max:255|unique:users',
             'company' => 'required|string|max:120',
         ]);
