@@ -102,7 +102,7 @@ class ReservationController extends Controller
             });
 
             $counted = $reservations->count().' '.__('spaces');
-            return (new ReservationResource($reservations))->additional([
+            return (new ReservationCollection($reservations))->additional([
                 'message' => __(':0 has been booked successfully, we would reach out to you with more information soon.', [$counted]),
                 'status' => 'success',
                 'status_code' => HttpStatus::CREATED,
