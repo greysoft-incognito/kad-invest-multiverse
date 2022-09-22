@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Reservation extends Model
 {
@@ -14,6 +15,7 @@ class Reservation extends Model
     protected $fillable = [
         'space_id',
         'user_id',
+        'user_type',
         'start_date',
         'end_date',
     ];
@@ -39,6 +41,16 @@ class Reservation extends Model
     }
 
     /**
+     * Get the user that owns the Transaction
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function guest(): BelongsTo
+    {
+        return $this->belongsTo(Guest::class, 'user_id', 'id');
+    }
+
+    /**
      *  Get the duration of this reservation.
      *
      * @return Attribute
@@ -60,5 +72,26 @@ class Reservation extends Model
         return new Attribute(
             get: fn () => $this->space->price * $this->getDuration(),
         );
+    }
+
+    public function status(): Attribute
+    {
+        return new Attribute(
+            get: function() {
+                $user = $this->user_type === 'guest' ? $this->guest : $this->user;
+                $transaction = $user ? $this->transactions()->whereUserId($user->id)->latest()->first() : null;
+                return $transaction
+                    ? ($transaction->status === 'pending' || $transaction->status === 'paid' ? 'reserved'  : $transaction->status)
+                    : 'pending';
+            },
+        );
+    }
+
+    /**
+     * Get all of the reservation's TRANSACTIONS.
+     */
+    public function transactions(): MorphMany
+    {
+        return $this->morphMany(Transaction::class, 'transactable');
     }
 }

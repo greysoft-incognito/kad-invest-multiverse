@@ -15,7 +15,7 @@ class FormDataResource extends JsonResource
      */
     public function toArray($request)
     {
-        $form = $this->form; 
+        $form = $this->form;
         $data = $this->data;
         $email_field = $form->fields()->where('type', 'email')->first();
         $fname_field = $form->fields()->where('name', 'like', '%firstname%')->orWhere('name', 'like', '%first_name%')->first();
@@ -29,14 +29,14 @@ class FormDataResource extends JsonResource
             $fullname_field && !$fname_field ? $data[$fullname_field->name]??"" : '',
             $name_field && !$fullname_field ? $data[$name_field->name]??'' : '',
         ])->filter(fn($name) => $name !=='')->implode(' ');
-        
+
         return collect([
-            'id' => $this->id, 
+            'id' => $this->id,
             'name' => $name,
-            'form_id' => $this->form_id, 
+            'form_id' => $this->form_id,
             'fields' => $this->form->fields,
             'email' => $data[$email_field->name],
-            'qr' => route('form.data.qr', $this->id),
+            'qr' => route('form.data.qr', ['form', $this->id]),
         ])
         ->merge($this->data);
     }

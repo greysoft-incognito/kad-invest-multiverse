@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->decimal('price')->default(0.00);
             $table->json('data')->nullable();
-            $table->integer('max_uccupants')->default(1);
+            $table->integer('max_occupants')->default(1);
             $table->timestamps();
         });
     }

@@ -67,6 +67,7 @@ class SpacesController extends Controller
         $space->name = $request->name;
         $space->info = $request->info;
         $space->price = $request->price;
+        $space->data = $request->data ?? [];
         $space->save();
 
         return (new SpaceResource($space))->additional([
@@ -103,6 +104,7 @@ class SpacesController extends Controller
         $space->name = $request->name ?? $space->name;
         $space->info = $request->info ?? $space->info;
         $space->price = $request->price ?? $space->price;
+        $space->data = $request->data ?? [];
         $space->save();
 
         return (new SpaceResource($space))->additional([

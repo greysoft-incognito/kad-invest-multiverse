@@ -23,6 +23,7 @@ class UserResource extends JsonResource
             'firstname' => $this->firstname,
             'lastname' => $this->lastname,
             'fullname' => $this->fullname,
+            'company' => $this->company,
             $this->mergeWhen(($request->user()->id === $this->id || $request->user()->isAdmin()) && ! in_array($route, []), [
                 'email' => $this->email,
                 'phone' => $this->phone,
