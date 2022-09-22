@@ -22,15 +22,6 @@ class ReservationController extends Controller
 
     public function guest(Request $request, Space $space)
     {
-        if ($space->available_spots <= 0) {
-            $error = __('This space is already booked up');
-            return $this->buildResponse([
-                'message' => $error,
-                'status' => 'error',
-                'status_code' => HttpStatus::BAD_REQUEST,
-            ]);
-        }
-
         $phone_val = stripos($request->phone, '+') !== false || !config('settings.verify_phone', false)
             ? 'phone:AUTO,NG'
             : 'phone:'.$this->ipInfo('country');
@@ -108,6 +99,15 @@ class ReservationController extends Controller
                 'status_code' => HttpStatus::CREATED,
             ])->response()->setStatusCode(HttpStatus::CREATED);
         } else {
+            if ($space->available_spots <= 0) {
+                $error = __('This space is already booked up');
+                return $this->buildResponse([
+                    'message' => $error,
+                    'status' => 'error',
+                    'status_code' => HttpStatus::BAD_REQUEST,
+                ]);
+            }
+
             $reservation = $space->reservations()->create([
                 'name' => $request->name,
                 'user_id' => $user->id,
