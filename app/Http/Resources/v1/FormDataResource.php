@@ -34,9 +34,10 @@ class FormDataResource extends JsonResource
             'id' => $this->id,
             'name' => $name,
             'form_id' => $this->form_id,
-            'fields' => $this->form->fields,
             'email' => $data[$email_field->name],
             'qr' => route('form.data.qr', ['form', $this->id]),
+            'scan_date' => $form->scan_date,
+            'fields' => $this->form->fields,
         ])
         ->merge($this->data);
     }

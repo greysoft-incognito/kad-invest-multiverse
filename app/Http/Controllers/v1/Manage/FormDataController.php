@@ -111,6 +111,9 @@ class FormDataController extends Controller
             'form_id' => $form_id,
         ]);
 
+        $data->scan_date = $data->scans()->latest()->first()->created_at;
+        $data->save();
+
         return (new FormDataResource($data))->additional([
             'message' => HttpStatus::message(HttpStatus::OK),
             'status' => 'success',
