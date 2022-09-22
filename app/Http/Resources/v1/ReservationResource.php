@@ -21,7 +21,8 @@ class ReservationResource extends JsonResource
             'id' => $this->id,
             'user_id' => $this->user_id,
             'space_id' => $this->space_id,
-            'name' => $this->space->name,
+            'selected_space' => $this->space->name,
+            'name' => $user->fullname,
             'email' => $user->email,
             'phone' => $user->phone,
             'company' => $user->company,
@@ -35,6 +36,7 @@ class ReservationResource extends JsonResource
             'user_type' => $this->user_type,
             'user' => $user,
             'fields' => [
+                'selected_space' => 'Selected Space',
                 'name' => 'Name',
                 'email' => 'Email',
                 'phone' => 'Phone',
