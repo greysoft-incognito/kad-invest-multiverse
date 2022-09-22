@@ -14,14 +14,14 @@ class ReservationResource extends JsonResource
      */
     public function toArray($request)
     {
-        $time_left = $this->created_at->diffForHumans(now()->subHours(24)->toDateTimeString());
+        $time_left = $this->created_at->diffInRealHours(now()->subHours(24)->toDateTimeString());
         $user = $this->user_type === 'guest' ? $this->guest : $this->user;
 
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
             'space_id' => $this->space_id,
-            'selected_space' => $this->space->name,
+            'selected_space' => $this->space ? $this->space->name : '',
             'name' => $user->fullname,
             'email' => $user->email,
             'phone' => $user->phone,
@@ -45,7 +45,7 @@ class ReservationResource extends JsonResource
                 'end_date' => 'End Date',
                 'status' => 'Status',
                 'paid' => 'Paid',
-                'time_left' => 'Time Left',
+                'time_left' => 'Time Left (Hours)',
                 'date' => 'Reservation Date',
             ])->map(function($value, $key) {
                 return [
