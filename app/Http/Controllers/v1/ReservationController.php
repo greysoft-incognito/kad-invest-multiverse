@@ -55,31 +55,7 @@ class ReservationController extends Controller
         );
 
         event(new Registered($user));
-
-        $reservation = $space->reservations()->create([
-            'name' => $request->name,
-            'user_id' => $user->id,
-            'user_type' => 'guest',
-            'start_date' => $request->start_date ?? null,
-            'end_date' => $request->end_date ?? null,
-        ]);
-
-        $reference = config('settings.trx_prefix', 'TRX-').$this->generate_string(20, 3);
-
-        $reservation->transactions()->create([
-            'user_id' => $user->id,
-            'amount' => $space->price,
-            'due' => $space->price,
-            'reference' => $reference,
-            'method' => 'Manual',
-            'status' => 'pending',
-        ]);
-
-        return (new ReservationResource($reservation))->additional([
-            'message' => __(':0 has been booked successfully, we would reach out to you with more information soon.', [$space->name]),
-            'status' => 'success',
-            'status_code' => HttpStatus::CREATED,
-        ])->response()->setStatusCode(HttpStatus::CREATED);
+        return $this->reserveNow($request, $space, $user);
     }
 
     public function store(Request $request, Space $space)
@@ -94,30 +70,68 @@ class ReservationController extends Controller
         }
 
         $user = Auth::user();
+        return $this->reserveNow($request, $space, $user);
+    }
 
-        $reservation = $space->reservations()->create([
-            'name' => $request->name,
-            'user_id' => $user->id,
-            'user_type' => 'user',
-            'start_date' => $request->start_date ?? null,
-            'end_date' => $request->end_date ?? null,
-        ]);
+    protected function reserveNow(Request $request, Space $space, $user)
+    {
+        if ($request->has('space_ids') && is_array($request->space_ids)) {
+            $reservations = collect($request->space_ids)->filter(function ($space) {
+                return $space != null;
+            })->map(function ($space_id) use ($user, $request) {
+                $space = Space::find($space_id);
 
-        $reference = config('settings.trx_prefix', 'TRX-').$this->generate_string(20, 3);
+                $reservation = $space->reservations()->create([
+                    'name' => $request->name,
+                    'user_id' => $user->id,
+                    'user_type' => 'user',
+                    'start_date' => $request->start_date ?? null,
+                    'end_date' => $request->end_date ?? null,
+                ]);
 
-        $reservation->transactions()->create([
-            'user_id' => $user->id,
-            'amount' => $space->price,
-            'due' => $space->price,
-            'reference' => $reference,
-            'method' => 'Manual',
-            'status' => 'pending',
-        ]);
+                $reference = config('settings.trx_prefix', 'TRX-').$this->generate_string(20, 3);
 
-        return (new ReservationResource($reservation))->additional([
-            'message' => __(':0 has been booked successfully, we would reach out to you with more information soon.', [$space->name]),
-            'status' => 'success',
-            'status_code' => HttpStatus::CREATED,
-        ])->response()->setStatusCode(HttpStatus::CREATED);
+                $reservation->transactions()->create([
+                    'user_id' => $user->id,
+                    'amount' => $space->price,
+                    'due' => $space->price,
+                    'reference' => $reference,
+                    'method' => 'Manual',
+                    'status' => 'pending',
+                ]);
+            });
+
+            $counted = $reservations->count().' '.__('spaces');
+            return (new ReservationResource($reservations))->additional([
+                'message' => __(':0 has been booked successfully, we would reach out to you with more information soon.', [$counted]),
+                'status' => 'success',
+                'status_code' => HttpStatus::CREATED,
+            ])->response()->setStatusCode(HttpStatus::CREATED);
+        } else {
+            $reservation = $space->reservations()->create([
+                'name' => $request->name,
+                'user_id' => $user->id,
+                'user_type' => 'user',
+                'start_date' => $request->start_date ?? null,
+                'end_date' => $request->end_date ?? null,
+            ]);
+
+            $reference = config('settings.trx_prefix', 'TRX-').$this->generate_string(20, 3);
+
+            $reservation->transactions()->create([
+                'user_id' => $user->id,
+                'amount' => $space->price,
+                'due' => $space->price,
+                'reference' => $reference,
+                'method' => 'Manual',
+                'status' => 'pending',
+            ]);
+
+            return (new ReservationResource($reservation))->additional([
+                'message' => __(':0 has been booked successfully, we would reach out to you with more information soon.', [$space->name]),
+                'status' => 'success',
+                'status_code' => HttpStatus::CREATED,
+            ])->response()->setStatusCode(HttpStatus::CREATED);
+        }
     }
 }
