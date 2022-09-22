@@ -129,14 +129,14 @@ class FormDataController extends Controller
         \Gate::authorize('usable', 'formdata.stats');
 
         if ($request->data) {
-            $data = collect(str($request->data)->explode(',')->mapWithKeys(function($value) use ($form) {
+          	
+          	$request_data = str($request->data)->explode(',');
+            $data = $request_data->mapWithKeys(function($value) use ($form, $request_data) {
                 $stat = str($value)->explode(':');
 
                 $key = is_numeric($stat[1]??$stat[0]) || is_bool($stat[1]??$stat[0])
                     ? $stat[0]
                     : $stat[1]??$stat[0];
-
-                $field = $form->fields()->where('name', $key)->first();
 
                 $values = str($stat[1]??'')->explode('.');
 
@@ -153,16 +153,24 @@ class FormDataController extends Controller
                 } elseif ( isset($stat[2]) ) {
                     $query->whereJsonContains("data->{$stat[0]}", [$stat[1], $stat[2]]);
                 } elseif ( $stat[1] ) {
+
+                	$field = $form->fields()->where('name', $stat[0])->first();
+   
                     if ($field && $field->type === 'multiple') {
-                        $query->whereJsonDoesntContain("data->{$stat[0]}", $stat[1]);
+                        $query->whereJsonContains("data->{$stat[0]}", $stat[1]);
                     } else {
                         $query->whereJsonContains("data->{$stat[0]}", $stat[1]);
                         $query->whereJsonDoesntContain("data->{$stat[0]}", [$stat[1]]);
                     }
+                    
+                  	$others = $request_data->filter(fn($rd)=> $rd !== "{$stat[0]}:{$stat[1]}")->toArray();
+                    foreach($others as $other) {
+                      $query->whereJsonDoesntContain("data->{$stat[0]}", str_ireplace("{$stat[0]}:", '', $other));
+                    }
                 }
 
                 return [$key => $query->count()];
-            }))->merge(['total' => $form->data()->count()]);
+            })->merge(['total' => $form->data()->count()]);
         } else {
             $data = ['total' => $form->data()->count()];
         }
