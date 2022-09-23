@@ -59,7 +59,7 @@ class SpacesController extends Controller
             'price' => 'required|numeric',
             'size' => 'sometimes|string',
             'image' => 'sometimes|image|mimes:png,jpg,jpeg|max:2048',
-            'max_uccupants' => 'required|numeric|min:1',
+            'max_occupants' => 'required|numeric|min:1',
         ]);
 
         $space = new Space();
@@ -97,7 +97,7 @@ class SpacesController extends Controller
             'price' => 'sometimes|numeric',
             'size' => 'sometimes|string',
             'image' => 'sometimes|image|mimes:png,jpg,jpeg|max:2048',
-            'max_uccupants' => 'sometimes|numeric|min:1',
+            'max_occupants' => 'sometimes|numeric|min:1',
         ]);
 
         $space->size = $request->size ?? $space->size ?? '0';
