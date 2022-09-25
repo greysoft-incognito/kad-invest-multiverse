@@ -58,16 +58,19 @@ class SpacesController extends Controller
             'info' => 'required|string',
             'price' => 'required|numeric',
             'size' => 'sometimes|string',
+            'color' => 'sometimes|string',
             'image' => 'sometimes|image|mimes:png,jpg,jpeg|max:2048',
+            'custom_data' => 'sometimes|array',
             'max_occupants' => 'required|numeric|min:1',
         ]);
 
         $space = new Space();
         $space->size = $request->size ?? '0';
+        $space->color = $request->color;
         $space->name = $request->name;
         $space->info = $request->info;
         $space->price = $request->price;
-        $space->data = $request->data ?? [];
+        $space->data = $request->custom_data ?? [];
         $space->save();
 
         return (new SpaceResource($space))->additional([
@@ -97,6 +100,7 @@ class SpacesController extends Controller
             'price' => 'sometimes|numeric',
             'size' => 'sometimes|string',
             'image' => 'sometimes|image|mimes:png,jpg,jpeg|max:2048',
+            'custom_data' => 'sometimes|array',
             'max_occupants' => 'sometimes|numeric|min:1',
         ]);
 
@@ -104,7 +108,7 @@ class SpacesController extends Controller
         $space->name = $request->name ?? $space->name;
         $space->info = $request->info ?? $space->info;
         $space->price = $request->price ?? $space->price;
-        $space->data = $request->data ?? [];
+        $space->data = $request->custom_data ?? $space->data ?? [];
         $space->save();
 
         return (new SpaceResource($space))->additional([
