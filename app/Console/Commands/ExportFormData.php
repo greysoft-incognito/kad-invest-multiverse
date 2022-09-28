@@ -101,7 +101,7 @@ class ExportFormData extends Command
                     'send-report:'.$email,
                     1,
                     function() use ($email) {
-                        Mail::to($email->toString())->send(new ReportGenerated($this->report));
+                        Mail::to($email->toString())->send(new ReportGenerated($this->form));
                     },
                     5
                 );
