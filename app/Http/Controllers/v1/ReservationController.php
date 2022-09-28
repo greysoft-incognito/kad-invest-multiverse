@@ -6,15 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\v1\ReservationCollection;
 use App\Http\Resources\v1\ReservationResource;
 use App\Models\v1\Guest;
-use App\Models\v1\Reservation;
 use App\Models\v1\Space;
-use App\Models\v1\User;
 use App\Services\HttpStatus;
 use App\Traits\Meta;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 
 class ReservationController extends Controller
 {
@@ -22,13 +19,13 @@ class ReservationController extends Controller
 
     public function guest(Request $request, Space $space)
     {
-        $phone_val = stripos($request->phone, '+') !== false || !config('settings.verify_phone', false)
+        $phone_val = stripos($request->phone, '+') !== false || ! config('settings.verify_phone', false)
             ? 'phone:AUTO,NG'
             : 'phone:'.$this->ipInfo('country');
 
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255'],// 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:255'], // 'unique:users'],
             'phone' => config('settings.verify_phone', false) ? "required|$phone_val" : 'nullable|string|max:255|unique:users',
             'company' => 'required|string|max:120',
             'start_date' => 'sometimes|date',
@@ -48,6 +45,7 @@ class ReservationController extends Controller
         );
 
         event(new Registered($user));
+
         return $this->reserveNow($request, $space, $user, 'guest');
     }
 
@@ -60,6 +58,7 @@ class ReservationController extends Controller
 
         if ($space->available_spots <= 0) {
             $error = __('This space is already booked up');
+
             return $this->buildResponse([
                 'message' => $error,
                 'status' => 'error',
@@ -68,6 +67,7 @@ class ReservationController extends Controller
         }
 
         $user = Auth::user();
+
         return $this->reserveNow($request, $space, $user, 'user');
     }
 
@@ -75,12 +75,13 @@ class ReservationController extends Controller
     {
         if ($request->has('space_ids') && is_array($request->space_ids)) {
             $spaces = Space::whereIn('id', $request->space_ids)->get();
-            $is_available = $spaces->mapWithKeys(function($space, $key) {
-                return [$space->id => !$space->is_available ? __(':name is no longer available', ['name' => $space->name]) : true];
+            $is_available = $spaces->mapWithKeys(function ($space, $key) {
+                return [$space->id => ! $space->is_available ? __(':name is no longer available', ['name' => $space->name]) : true];
             });
 
-            if (($errors = $is_available->filter(fn($value) => $value !== true))->count() > 0) {
+            if (($errors = $is_available->filter(fn ($value) => $value !== true))->count() > 0) {
                 $error = __('Some spaces you selected are no longer available');
+
                 return $this->buildResponse([
                     'message' => $error,
                     'status' => 'error',
@@ -110,6 +111,7 @@ class ReservationController extends Controller
             });
 
             $counted = $reservations->count().' '.__('spaces');
+
             return (new ReservationCollection($reservations))->additional([
                 'message' => __(':0 has been booked successfully, we would reach out to you with more information soon.', [$counted]),
                 'status' => 'success',
@@ -118,6 +120,7 @@ class ReservationController extends Controller
         } else {
             if ($space->available_spots <= 0) {
                 $error = __('This space is already booked up');
+
                 return $this->buildResponse([
                     'message' => $error,
                     'status' => 'error',

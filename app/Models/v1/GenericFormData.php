@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * Class GenericFormData
+ *
+ * @additions @property int $user_id
+ */
 class GenericFormData extends Model
 {
     use HasFactory, Notifiable;
@@ -29,6 +34,7 @@ class GenericFormData extends Model
     protected $fillable = [
         'scan_date',
         'form_id',
+        'user_id',
         'data',
         'key',
     ];
@@ -57,20 +63,27 @@ class GenericFormData extends Model
      */
     public function routeNotificationForMail()
     {
-        $email_field = $this->form->fields()->where('type', 'email')->first();
-        $fname_field = $this->form->fields()->where('name', 'like', '%firstname%')->orWhere('name', 'like', '%first_name%')->first();
-        $lname_field = $this->form->fields()->where('name', 'like', '%lastname%')->orWhere('name', 'like', '%last_name%')->first();
-        $fullname_field = $this->form->fields()->where('name', 'like', '%fullname%')->orWhere('name', 'like', '%full_name%')->first();
-        $name_field = $this->form->fields()->where('name', 'like', '%name%')->first();
-        $name = collect([
-            $fname_field ? $this->data[$fname_field->name] : '',
-            $lname_field ? $this->data[$lname_field->name] : '',
-            $fullname_field && !$fname_field && !$fname_field ? $this->data[$fullname_field->name] : '',
-            $name_field && !$fname_field && !$fname_field && !$fullname_field ? $this->data[$name_field->name] : '',
-        ])->filter(fn($name) => $name !=='')->implode(' ');
+        if ($this->user) {
+            return [$this->user->email => $this->user->fullname];
+        } else {
+            $email_field = $this->form->fields()->email()->first();
+            $fname_field = $this->form->fields()->fname()->first();
+            $lname_field = $this->form->fields()->lname()->first();
+            $fullname_field = $this->form->fields()->fullname()->first();
 
-        // Return email address and name...
-        return [$this->data[$email_field->name]??0 => $name];
+            $name = collect([
+                $this->data[$fname_field->name ?? '--'] ?? '',
+                $this->data[$lname_field->name ?? '--'] ?? '',
+                ! $fname_field && ! $lname_field ? $this->data[$fullname_field->name] : '',
+            ])->filter(fn ($name) => $name !== '')->implode(' ');
+
+            // Return email address and name...
+            if (isset($this->data[$email_field->name ?? '--'])) {
+                return [$this->data[$email_field->name ?? '--'] ?? null => $name];
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -81,25 +94,28 @@ class GenericFormData extends Model
      */
     public function routeNotificationForTwilio()
     {
-        $phone_field = $this->form->fields()->where(function($query) {
-            $query->where('type', 'like', '%phone%')
-                ->orWhere('type', 'like', '%tel%')
-                ->orWhere('type', 'like', '%mobile%')
-                ->orWhere('type', 'like', '%number%')
-                ->orWhere('type', 'like', '%cell%');
-        })->where(function($query) {
-            $query->where('name', 'like', '%phone%')
-                ->orWhere('name', 'like', '%tel%')
-                ->orWhere('name', 'like', '%mobile%')
-                ->orWhere('name', 'like', '%number%')
-                ->orWhere('name', 'like', '%cell%');
-        })->first();
-        return $this->data[$phone_field->name]??null;
+        if ($this->user) {
+            return [$this->user->phone];
+        } else {
+            $phone_field = $this->form->fields()->phone()->first();
+
+            return $this->data[$phone_field->name] ?? null;
+        }
     }
 
     // Load scans
     public function scans()
     {
         return $this->hasMany(ScanHistory::class, 'form_data_id', 'id');
+    }
+
+    /**
+     * Get the user that owns the GenericFormData
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

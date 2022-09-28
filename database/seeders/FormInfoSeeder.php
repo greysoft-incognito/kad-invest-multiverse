@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\v1\Form;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class FormInfoSeeder extends Seeder
@@ -35,7 +34,7 @@ class FormInfoSeeder extends Seeder
                     ], [
                         'title' => 'Gala Night',
                         'content' => 'Saturday, 15th October 2022',
-                    ]
+                    ],
                 ]),
                 'icon' => null,
                 'icon_color' => null,
@@ -43,7 +42,7 @@ class FormInfoSeeder extends Seeder
                 'image' => '',
                 'template' => null,
                 'position' => 'left',
-                'type' => 'list'
+                'type' => 'list',
             ], [
                 'form_id' => $form->id,
                 'title' => 'Register Now',
@@ -56,8 +55,8 @@ class FormInfoSeeder extends Seeder
                 'image' => null,
                 'template' => null,
                 'position' => 'left',
-                'type' => 'cta'
-            ]
+                'type' => 'cta',
+            ],
         ]);
     }
 }

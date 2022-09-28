@@ -39,17 +39,17 @@ class FormInfoController extends Controller
     {
         \Gate::authorize('usable', 'form.list');
         $request->validate([
-            "priority" => "nullable|numeric|min:1|max:5",
-            "title" => "required|string|min:3|max:55",
-            "subtitle" => "nullable|string|min:3|max:55",
-            "content" => "required_without:list|string|min:15",
-            "list" => "nullable|array",
-            "icon" => "nullable|string",
-            "icon_color" => "nullable|string",
-            "increment_icon" => "nullable|boolean",
-            "position" => "required|string|in:left,right",
-            "type" => 'required|string|in:text,list,cta,video,image',
-            "template" => 'nullable|string',
+            'priority' => 'nullable|numeric|min:1|max:5',
+            'title' => 'required|string|min:3|max:55',
+            'subtitle' => 'nullable|string|min:3|max:55',
+            'content' => 'required_without:list|string|min:15',
+            'list' => 'nullable|array',
+            'icon' => 'nullable|string',
+            'icon_color' => 'nullable|string',
+            'increment_icon' => 'nullable|boolean',
+            'position' => 'required|string|in:left,right',
+            'type' => 'required|string|in:text,list,cta,video,image',
+            'template' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpg,png|max:1524',
         ]);
 
@@ -68,9 +68,9 @@ class FormInfoController extends Controller
         $info->type = $request->type;
         $info->position = $request->position;
         $info->save();
-        
+
         return (new FormInfoResource($info))->additional([
-            'message' => __("Form info added successfully."),
+            'message' => __('Form info added successfully.'),
             'status' => 'success',
             'status_code' => HttpStatus::OK,
         ]);
@@ -104,17 +104,17 @@ class FormInfoController extends Controller
     {
         \Gate::authorize('usable', 'form.list');
         $request->validate([
-            "priority" => "nullable|numeric|min:1|max:5",
-            "title" => "required|string|min:3|max:55",
-            "subtitle" => "nullable|string|min:3|max:55",
-            "content" => "required_without:list|string|min:15",
-            "list" => "nullable|array",
-            "icon" => "nullable|string",
-            "icon_color" => "nullable|string",
-            "increment_icon" => "nullable|boolean",
-            "position" => "required|string|in:left,right",
-            "type" => 'required|string|in:text,list,cta,video,image',
-            "template" => 'nullable|string',
+            'priority' => 'nullable|numeric|min:1|max:5',
+            'title' => 'required|string|min:3|max:55',
+            'subtitle' => 'nullable|string|min:3|max:55',
+            'content' => 'required_without:list|string|min:15',
+            'list' => 'nullable|array',
+            'icon' => 'nullable|string',
+            'icon_color' => 'nullable|string',
+            'increment_icon' => 'nullable|boolean',
+            'position' => 'required|string|in:left,right',
+            'type' => 'required|string|in:text,list,cta,video,image',
+            'template' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpg,png|max:1524',
         ]);
 
@@ -132,7 +132,7 @@ class FormInfoController extends Controller
         $info->type = $request->type;
         $info->position = $request->position;
         $info->save();
-        
+
         return (new FormInfoResource($info))->additional([
             'message' => __("{$info->title} has been updated successfully."),
             'status' => 'success',
@@ -157,11 +157,11 @@ class FormInfoController extends Controller
                 }
 
                 return false;
-            })->filter(fn ($i) =>$i !== false)->count();
+            })->filter(fn ($i) => $i !== false)->count();
 
             return $this->buildResponse([
                 'message' => "{$count} form infos have been deleted.",
-                'status' =>  'success',
+                'status' => 'success',
                 'status_code' => HttpStatus::OK,
             ]);
         } else {
@@ -173,7 +173,7 @@ class FormInfoController extends Controller
 
             return $this->buildResponse([
                 'message' => "{$form->title} has been deleted.",
-                'status' =>  'success',
+                'status' => 'success',
                 'status_code' => HttpStatus::ACCEPTED,
             ]);
         }

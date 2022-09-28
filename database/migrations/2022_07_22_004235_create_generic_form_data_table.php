@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('generic_form_data', function (Blueprint $table) {
             $table->id();
             $table->foreignId('form_id')->constrained('forms', 'id')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->integer('user_id')->index()->nullable();
             $table->string('key')->index();
             $table->json('data')->nullable();
             $table->timestamp('scan_date')->nullable();

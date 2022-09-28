@@ -4,11 +4,12 @@ namespace App\Exceptions;
 
 use App\Services\HttpStatus;
 use App\Traits\Renderer;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Http\Exceptions\ThrottleRequestsException;
 // use Spatie\MediaLibrary\MediaCollections\Exceptions\FileUnacceptableForCollection;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -75,6 +76,7 @@ class Handler extends ExceptionHandler
                     HttpStatus::message(HttpStatus::NOT_FOUND),
                     HttpStatus::NOT_FOUND
                 ),
+                $e instanceof AuthorizationException ||
                 $e instanceof AccessDeniedHttpException => $this->renderException(
                     HttpStatus::message(HttpStatus::FORBIDDEN),
                     HttpStatus::FORBIDDEN
@@ -108,6 +110,14 @@ class Handler extends ExceptionHandler
                 ),
                 default => $this->renderException($getMessage, HttpStatus::SERVER_ERROR),
             };
+        } elseif ($this->isHttpException($e) && $e->getStatusCode() !== 401) {
+            $this->registerErrorViewPaths();
+
+            return response()->view('errors.generic', [
+                'message' => $e->getMessage(),
+                'code' => $e->getStatusCode(),
+            ], $e->getStatusCode()
+            );
         }
 
         return parent::render($request, $e);

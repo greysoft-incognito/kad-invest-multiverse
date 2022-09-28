@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\v1\Guest;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -52,6 +54,38 @@ class LoginRequest extends FormRequest
                 'email' => __('auth.failed'),
             ]);
         }
+
+        RateLimiter::clear($this->throttleKey());
+    }
+
+    /**
+     * Attempt to authenticate the request's credentials.
+     *
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function authenticateGuest($portal = null)
+    {
+        $this->ensureIsNotRateLimited();
+
+        $user = Guest::where('email', $this->email)->first();
+
+        if (! $user || ! Hash::check($this->password, $user->password)) {
+            RateLimiter::hit($this->throttleKey());
+            throw ValidationException::withMessages([
+                'email' => __('auth.failed'),
+            ]);
+        }
+
+        $portal_pass = ! $portal || $portal->reg_form->data()->where('user_id', $user->id ?? '--')->exists();
+        if (! $portal_pass) {
+            throw ValidationException::withMessages([
+                'email' => __('You do not have an account on this portal.'),
+            ]);
+        }
+
+        Auth::login($user);
 
         RateLimiter::clear($this->throttleKey());
     }

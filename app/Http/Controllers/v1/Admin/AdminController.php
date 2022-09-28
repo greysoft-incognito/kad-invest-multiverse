@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\v1\Admin;
 
-use App\Services\HttpStatus;
 use App\Http\Controllers\Controller;
+use App\Services\HttpStatus;
 use App\Services\Media;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
@@ -64,7 +64,7 @@ class AdminController extends Controller
 
         $settings = collect(config('settings'))
             ->except(['permissions', 'messages', 'system'])
-            ->filter(fn($v, $k)=>stripos($k, 'secret') === false)
+            ->filter(fn ($v, $k) => stripos($k, 'secret') === false)
             ->mergeRecursive([
             ]);
 

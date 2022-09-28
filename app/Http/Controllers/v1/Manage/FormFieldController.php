@@ -71,10 +71,10 @@ class FormFieldController extends Controller
             'required_if' => 'nullable|string',
             'restricted' => 'nullable|boolean',
             'key' => 'nullable|string',
-            'min' => ['numeric', Rule::requiredIf($request->compare && $request->type === 'date' && !$request->max)],
-            'max' => ['numeric', Rule::requiredIf($request->compare && $request->type === 'date' && !$request->min)],
+            'min' => ['numeric', Rule::requiredIf($request->compare && $request->type === 'date' && ! $request->max)],
+            'max' => ['numeric', Rule::requiredIf($request->compare && $request->type === 'date' && ! $request->min)],
             'element' => 'required|string|in:input,textarea,select',
-            'type' => 'required|string|in:hidden,text,number,email,password,date,time,datetime-local,file,tel,url,checkbox,radio'
+            'type' => 'required|string|in:hidden,text,number,email,password,date,time,datetime-local,file,tel,url,checkbox,radio',
         ], [
             'min.required' => 'the Min field is required if Compare is set and Type equals date while Max is missing',
             'max.required' => 'the Max field is required if Compare is set and Type equals date while Min is missing',
@@ -101,7 +101,7 @@ class FormFieldController extends Controller
         $field->save();
 
         return (new FormFieldResource($field))->additional([
-            'message' => __("Your form field has been created successfully."),
+            'message' => __('Your form field has been created successfully.'),
             'status' => 'success',
             'status_code' => HttpStatus::CREATED,
         ]);
@@ -145,10 +145,10 @@ class FormFieldController extends Controller
             'data.*.required_if' => 'nullable|string',
             'data.*.restricted' => 'nullable|boolean',
             'data.*.key' => 'required|string',
-            'data.*.min' => 'numeric', 
+            'data.*.min' => 'numeric',
             'data.*.max' => 'numeric',
             'data.*.element' => 'required|string|in:input,textarea,select',
-            'data.*.type' => 'required|string|in:hidden,text,number,email,password,date,time,datetime-local,file,tel,url,checkbox,radio'
+            'data.*.type' => 'required|string|in:hidden,text,number,email,password,date,time,datetime-local,file,tel,url,checkbox,radio',
         ], [
             'data.*.min.required' => '[FIELD #:index] The Min field is required if Compare is set and Type equals date while Max is missing',
             'data.*.max.required' => '[FIELD #:index] The Max field is required if Compare is set and Type equals date while Min is missing',
@@ -164,46 +164,47 @@ class FormFieldController extends Controller
             'data.*.required_if' => '#:index Required If',
             'data.*.restricted' => '#:index Restricted',
             'data.*.key' => '#:index Key',
-            'data.*.min' => '#:index Min', 
+            'data.*.min' => '#:index Min',
             'data.*.max' => '#:index Max',
             'data.*.element' => '#:index Element',
             'data.*.type' => '#:index Type',
         ]);
 
         $validator->sometimes(['data.*.min', 'data.*.max'], 'required', function ($input, $item) {
-            return $item->compare && $item->type === 'date' && !$item->min;
+            return $item->compare && $item->type === 'date' && ! $item->min;
         });
 
         $validator->validate();
 
-        $fields = collect($request->data)->map(function($data) use ($form) {
-            $field = $form->fields()->where('id', $data['id']??null)->firstOrNew();
-            $field->name = $data['name']??null;
-            $field->field_id = $data['name']??null;
-            $field->label = $data['label']??null;
-            $field->value = $data['value']??null;
-            $field->hint = $data['hint']??null;
-            $field->custom_error = $data['custom_error']??null;
-            $field->compare = $data['compare']??null;
-            $field->options = $data['options']??null;
-            $field->required = $data['required']??null;
-            $field->required_if = $data['required_if']??null;
-            $field->restricted = $data['restricted']??null;
-            $field->key = $data['key']??null;
-            $field->min = $data['min']??null;
-            $field->max = $data['max']??null;
-            $field->element = $data['element']??null;
-            $field->type = $data['type']??null;
+        $fields = collect($request->data)->map(function ($data) use ($form) {
+            $field = $form->fields()->where('id', $data['id'] ?? null)->firstOrNew();
+            $field->name = $data['name'] ?? null;
+            $field->field_id = $data['name'] ?? null;
+            $field->label = $data['label'] ?? null;
+            $field->value = $data['value'] ?? null;
+            $field->hint = $data['hint'] ?? null;
+            $field->custom_error = $data['custom_error'] ?? null;
+            $field->compare = $data['compare'] ?? null;
+            $field->options = $data['options'] ?? null;
+            $field->required = $data['required'] ?? null;
+            $field->required_if = $data['required_if'] ?? null;
+            $field->restricted = $data['restricted'] ?? null;
+            $field->key = $data['key'] ?? null;
+            $field->min = $data['min'] ?? null;
+            $field->max = $data['max'] ?? null;
+            $field->element = $data['element'] ?? null;
+            $field->type = $data['type'] ?? null;
             $field->save();
-            $field->updated = !!($data['id']??null);
+            $field->updated = (bool) ($data['id'] ?? null);
+
             return $field;
         });
 
-        $count_id = $fields->filter(fn($f)=>$f['updated'])->count();
-        $count_no_id = $fields->filter(fn($f)=>!$f['updated'])->count();
+        $count_id = $fields->filter(fn ($f) => $f['updated'])->count();
+        $count_no_id = $fields->filter(fn ($f) => ! $f['updated'])->count();
 
         return (new FormFieldCollection($fields))->additional([
-            'message' => __(":0 field(s) updated, :1 new field(s) created.", [$count_id, $count_no_id]),
+            'message' => __(':0 field(s) updated, :1 new field(s) created.', [$count_id, $count_no_id]),
             'status' => 'success',
             'status_code' => HttpStatus::ACCEPTED,
         ]);
@@ -220,7 +221,7 @@ class FormFieldController extends Controller
     {
         \Gate::authorize('usable', 'formfield.update');
         $field = $form->fields()->findOrFail($id);
-        
+
         $request->validate([
             'name' => 'required|string',
             'label' => 'required|string',
@@ -233,10 +234,10 @@ class FormFieldController extends Controller
             'required_if' => 'nullable|string',
             'restricted' => 'nullable|boolean',
             'key' => 'required|string',
-            'min' => ['numeric', Rule::requiredIf($request->compare && $request->type === 'date' && !$request->max)],
-            'max' => ['numeric', Rule::requiredIf($request->compare && $request->type === 'date' && !$request->min)],
+            'min' => ['numeric', Rule::requiredIf($request->compare && $request->type === 'date' && ! $request->max)],
+            'max' => ['numeric', Rule::requiredIf($request->compare && $request->type === 'date' && ! $request->min)],
             'element' => 'required|string|in:input,textarea,select',
-            'type' => 'required|string|in:hidden,text,number,email,password,date,time,datetime-local,file,tel,url,checkbox,radio'
+            'type' => 'required|string|in:hidden,text,number,email,password,date,time,datetime-local,file,tel,url,checkbox,radio',
         ], [
             'min.required' => 'the Min field is required if Compare is set and Type equals date while Max is missing',
             'max.required' => 'the Max field is required if Compare is set and Type equals date while Min is missing',
@@ -284,11 +285,11 @@ class FormFieldController extends Controller
                 }
 
                 return false;
-            })->filter(fn ($i) =>$i !== false)->count();
+            })->filter(fn ($i) => $i !== false)->count();
 
             return $this->buildResponse([
                 'message' => "{$count} form feilds have been deleted.",
-                'status' =>  'success',
+                'status' => 'success',
                 'status_code' => HttpStatus::OK,
             ]);
         } else {
@@ -300,7 +301,7 @@ class FormFieldController extends Controller
 
             return $this->buildResponse([
                 'message' => "{$field->label} has been deleted.",
-                'status' =>  'success',
+                'status' => 'success',
                 'status_code' => HttpStatus::ACCEPTED,
             ]);
         }

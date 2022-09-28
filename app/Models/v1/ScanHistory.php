@@ -13,7 +13,7 @@ class ScanHistory extends Model
     protected $fillable = [
         'qrcode',
         'form_id',
-        'user_id'
+        'user_id',
     ];
 
     /**

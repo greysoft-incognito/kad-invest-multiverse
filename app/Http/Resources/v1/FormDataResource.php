@@ -17,29 +17,30 @@ class FormDataResource extends JsonResource
     {
         $form = $this->form;
         $data = $this->data;
-        $email_field = $form->fields()->where('type', 'email')->first();
-        $fname_field = $form->fields()->where('name', 'like', '%firstname%')->orWhere('name', 'like', '%first_name%')->first();
-        $lname_field = $form->fields()->where('name', 'like', '%lastname%')->orWhere('name', 'like', '%last_name%')->first();
-        $fullname_field = $form->fields()->where('name', 'like', '%fullname%')->orWhere('name', 'like', '%full_name%')->first();
-        $name_field = $form->fields()->where('name', 'like', '%name%')->first();
+
+        $email_field = $form->fields()->email()->first();
+        $phone_field = $form->fields()->phone()->first();
+        $fname_field = $form->fields()->fname()->first();
+        $lname_field = $form->fields()->lname()->first();
+        $fullname_field = $form->fields()->fullname()->first();
 
         $name = collect([
-            $fname_field ? $data[$fname_field->name]??$this->id : '',
-            $lname_field ? $data[$lname_field->name]??'' : '',
-            $fullname_field && !$fname_field ? $data[$fullname_field->name]??"" : '',
-            $name_field && !$fullname_field ? $data[$name_field->name]??'' : '',
-        ])->filter(fn($name) => $name !=='')->implode(' ');
+            $this->data[$fname_field->name ?? '--'] ?? '',
+            $this->data[$lname_field->name ?? '--'] ?? '',
+            ! $fname_field && ! $lname_field ? $this->data[$fullname_field->name] : '',
+        ])->filter(fn ($name) => $name !== '')->implode(' ');
 
         return collect([
             'id' => $this->id,
             'name' => $name,
             'form_id' => $this->form_id,
-            'email' => $data[$email_field->name],
+            'email' => $this->whenNotNull($data[$email_field->name ?? ''] ?? null),
+            'phone' => $this->whenNotNull($data[$phone_field->name ?? ''] ?? null),
             'qr' => route('form.data.qr', ['form', $this->id]),
             'scan_date' => $form->scan_date,
-            'fields' => $this->form->fields,
+            'fields' => $form->fields,
         ])
-        ->merge($this->data);
+        ->merge($this->data)->except(['fields']);
     }
 
     /**

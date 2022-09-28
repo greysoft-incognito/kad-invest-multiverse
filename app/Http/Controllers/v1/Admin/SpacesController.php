@@ -128,18 +128,18 @@ class SpacesController extends Controller
     {
         $this->authorize('can-do', ['spaces.delete']);
         if ($request->items) {
-            $count = collect($request->items)->map(function ($item){
+            $count = collect($request->items)->map(function ($item) {
                 $item = Space::find($item);
                 if ($item) {
                     return $item->delete();
                 }
 
                 return false;
-            })->filter(fn ($i) =>$i !== false)->count();
+            })->filter(fn ($i) => $i !== false)->count();
 
             return $this->buildResponse([
                 'message' => "{$count} spaces have been deleted.",
-                'status' =>  'success',
+                'status' => 'success',
                 'status_code' => HttpStatus::OK,
             ]);
         } else {
@@ -149,7 +149,7 @@ class SpacesController extends Controller
 
                 return $this->buildResponse([
                     'message' => "{$item->name} has been deleted.",
-                    'status' =>  'success',
+                    'status' => 'success',
                     'status_code' => HttpStatus::ACCEPTED,
                 ]);
             }

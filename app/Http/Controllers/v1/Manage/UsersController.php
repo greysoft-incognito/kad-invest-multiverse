@@ -51,7 +51,7 @@ class UsersController extends Controller
 
         return (new UserCollection($users))->additional([
             'message' => HttpStatus::message(HttpStatus::OK),
-            'status' =>  $users->isEmpty() ? 'info' : 'success',
+            'status' => $users->isEmpty() ? 'info' : 'success',
             'status_code' => HttpStatus::OK,
         ]);
     }
@@ -89,7 +89,7 @@ class UsersController extends Controller
         $user->phone = $request->phone;
         if ($request->privileges) {
             $prev = is_array($request->privileges) ? $request->privileges : explode(',', $request->privileges);
-            $user->privileges =  $prev;
+            $user->privileges = $prev;
         }
         if ($request->password) {
             $user->password = Hash::make($request->password);
@@ -122,10 +122,10 @@ class UsersController extends Controller
         $user->lastname = $request->lastname;
         $user->email = $request->email;
         $user->phone = $request->phone;
-        
+
         if ($request->privileges) {
             $prev = is_array($request->privileges) ? $request->privileges : explode(',', $request->privileges);
-            $user->privileges =  $prev;
+            $user->privileges = $prev;
         }
         if ($request->password) {
             $user->password = Hash::make($request->password);
@@ -157,11 +157,11 @@ class UsersController extends Controller
                 return $user->delete();
 
                 return false;
-            })->filter(fn ($i) =>$i !== false)->count();
+            })->filter(fn ($i) => $i !== false)->count();
 
             return $this->buildResponse([
                 'message' => "{$count} users have been deleted.",
-                'status' =>  'success',
+                'status' => 'success',
                 'response_code' => HttpStatus::ACCEPTED,
             ]);
         } else {
@@ -174,7 +174,7 @@ class UsersController extends Controller
 
             return $this->buildResponse([
                 'message' => "{$user->fullname} has been deleted.",
-                'status' =>  'success',
+                'status' => 'success',
                 'response_code' => HttpStatus::ACCEPTED,
             ]);
         }

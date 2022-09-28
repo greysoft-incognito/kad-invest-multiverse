@@ -4,9 +4,9 @@ namespace App\Models\v1;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
@@ -59,7 +59,7 @@ class Guest extends Authenticatable
     public static function registerEvents()
     {
         static::creating(function ($item) {
-            $item->password = Hash::make($item->phone);
+            $item->password = Hash::make($item->password ?? $item->phone);
         });
     }
 

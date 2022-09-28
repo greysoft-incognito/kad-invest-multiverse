@@ -7,7 +7,6 @@ use App\Http\Resources\v1\ScanHistoryCollection;
 use App\Http\Resources\v1\ScanHistoryResource;
 use App\Models\v1\ScanHistory;
 use App\Services\HttpStatus;
-use Illuminate\Http\Request;
 
 class ScanHistoryController extends Controller
 {

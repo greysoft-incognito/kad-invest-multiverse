@@ -74,12 +74,14 @@ class Media
                 if ($get_path === true) {
                     return Storage::path($this->default_media);
                 }
+
                 return asset($this->default_media);
             }
 
             if ($get_path === true) {
                 return Storage::path($getPath.$default);
             }
+
             return asset($getPath.$default);
         }
 
@@ -90,6 +92,7 @@ class Media
         if ($get_path === true) {
             return Storage::path($getPath.$src);
         }
+
         return asset($getPath.$src);
     }
 

@@ -9,6 +9,7 @@ use App\Models\v1\Form;
 use App\Services\HttpStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class FormController extends Controller
 {
@@ -73,6 +74,8 @@ class FormController extends Controller
             'socials' => 'nullable|array',
             'deadline' => 'nullable|string',
             'template' => 'nullable',
+            'dont_notify' => 'nullable|boolean',
+            'data_emails' => 'nullable|string',
         ]);
 
         $form = new Form;
@@ -86,10 +89,12 @@ class FormController extends Controller
         $form->socials = $request->socials;
         $form->deadline = $request->deadline;
         $form->template = $request->template;
+        $form->dont_notify = $request->dont_notify ?? false;
+        $form->data_emails = $request->data_emails;
         $form->save();
-        
+
         return (new FormResource($form))->additional([
-            'message' => __("Your form has been created successfully."),
+            'message' => __('Your form has been created successfully.'),
             'status' => 'success',
             'status_code' => HttpStatus::OK,
         ]);
@@ -124,7 +129,7 @@ class FormController extends Controller
     {
         \Gate::authorize('usable', 'form.update');
         $form = Form::findOrFail($id);
-        
+
         $request->validate([
             'name' => 'required|string|min:3|max:55',
             'title' => 'required|string|min:3|max:55',
@@ -136,6 +141,8 @@ class FormController extends Controller
             'socials' => 'nullable|array',
             'deadline' => 'nullable|string',
             'template' => 'nullable',
+            'dont_notify' => 'nullable|boolean',
+            'data_emails' => 'nullable|string',
         ]);
 
         $form->name = $request->name;
@@ -148,8 +155,10 @@ class FormController extends Controller
         $form->socials = $request->socials;
         $form->deadline = $request->deadline;
         $form->template = $request->template;
+        $form->dont_notify = $request->dont_notify ?? false;
+        $form->data_emails = $request->data_emails ?? Arr::join($form->data_emails, ',');
         $form->save();
-        
+
         return (new FormResource($form))->additional([
             'message' => __("{$form->name} has been updated successfully."),
             'status' => 'success',
@@ -174,11 +183,11 @@ class FormController extends Controller
                 }
 
                 return false;
-            })->filter(fn ($i) =>$i !== false)->count();
+            })->filter(fn ($i) => $i !== false)->count();
 
             return $this->buildResponse([
                 'message' => "{$count} forms have been deleted.",
-                'status' =>  'success',
+                'status' => 'success',
                 'status_code' => HttpStatus::OK,
             ]);
         } else {
@@ -190,7 +199,7 @@ class FormController extends Controller
 
             return $this->buildResponse([
                 'message' => "{$form->name} has been deleted.",
-                'status' =>  'success',
+                'status' => 'success',
                 'status_code' => HttpStatus::ACCEPTED,
             ]);
         }

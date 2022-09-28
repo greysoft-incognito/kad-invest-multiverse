@@ -105,4 +105,14 @@ class User extends Authenticatable
     {
         return $this->morphMany(Transaction::class, 'transactable');
     }
+
+    /**
+     * Get all of the form_data for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function form_data(): HasMany
+    {
+        return $this->hasMany(GenericFormData::class);
+    }
 }

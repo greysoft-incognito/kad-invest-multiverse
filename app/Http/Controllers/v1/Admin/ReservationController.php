@@ -63,10 +63,9 @@ class ReservationController extends Controller
         $query = Reservation::query();
 
         if (in_array($status, ['reserved', 'paid', 'pending', 'cancelled', 'failed'])) {
-
-            $query->whereHas('transactions', function($query) use ($status) {
+            $query->whereHas('transactions', function ($query) use ($status) {
                 if ($status === 'reserved') {
-                    $query->where(function($query) {
+                    $query->where(function ($query) {
                         $query->where('status', 'pending');
                         $query->orWhere('status', 'paid');
                     });
@@ -165,7 +164,7 @@ class ReservationController extends Controller
         $user = $reservation->user_type === 'guest' ? $reservation->guest : $reservation->user;
         $transaction = $reservation->transactions()->whereUserId($user->id)->latest()->first();
 
-       if ($transaction) {
+        if ($transaction) {
             $transaction->update([
                 'status' => $request->status,
             ]);
@@ -188,18 +187,18 @@ class ReservationController extends Controller
     {
         $this->authorize('can-do', ['reservation.delete']);
         if ($request->items) {
-            $count = collect($request->items)->map(function ($item){
+            $count = collect($request->items)->map(function ($item) {
                 $item = Reservation::find($item);
                 if ($item) {
                     return $item->delete();
                 }
 
                 return false;
-            })->filter(fn ($i) =>$i !== false)->count();
+            })->filter(fn ($i) => $i !== false)->count();
 
             return $this->buildResponse([
                 'message' => "{$count} reservations have been deleted.",
-                'status' =>  'success',
+                'status' => 'success',
                 'status_code' => HttpStatus::OK,
             ]);
         } else {
@@ -208,8 +207,8 @@ class ReservationController extends Controller
                 $item->delete();
 
                 return $this->buildResponse([
-                    'message' => "This reservation has been deleted.",
-                    'status' =>  'success',
+                    'message' => 'This reservation has been deleted.',
+                    'status' => 'success',
                     'status_code' => HttpStatus::ACCEPTED,
                 ]);
             }

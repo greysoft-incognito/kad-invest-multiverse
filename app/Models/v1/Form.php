@@ -20,6 +20,7 @@ class Form extends Model
     protected $casts = [
         'deadline' => 'datetime',
         'socials' => 'array',
+        'dont_notify' => 'boolean',
     ];
 
     /**
@@ -29,7 +30,7 @@ class Form extends Model
      */
     protected $appends = [
         'banner_url',
-        'logo_url'
+        'logo_url',
     ];
 
     public function registerFileable()
@@ -71,6 +72,18 @@ class Form extends Model
     }
 
     /**
+     * Get the emails that recieve data reports.
+     *
+     * @return string
+     */
+    protected function dataEmails(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($a) => str($a ?? '')->explode(',')->map(fn ($e) => str($e)->trim()),
+        );
+    }
+
+    /**
      * Get all of the fields for the Form
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
@@ -105,11 +118,11 @@ class Form extends Model
     public function socials(): Attribute
     {
         return new Attribute(
-            get: fn ($value) => collect($value)->map(function($value, $key) {
+            get: fn ($value) => collect($value)->map(function ($value, $key) {
                 return [
                     'url' => $value,
                     'icon' => "fas fa-$key",
-                    'label' => "@".str($value)->explode('/')->last(),
+                    'label' => '@'.str($value)->explode('/')->last(),
                 ];
             })->toArray(),
         );

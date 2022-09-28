@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\v1;
 
-use App\Services\HttpStatus;
 use App\Http\Controllers\Controller;
+use App\Services\HttpStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -29,7 +29,7 @@ class HomeController extends Controller
             'status_code' => HttpStatus::OK,
             'settings' => collect(config('settings'))
                 ->except(['permissions', 'messages', 'system'])
-                ->filter(fn($v, $k)=>stripos($k, 'secret') === false)
+                ->filter(fn ($v, $k) => stripos($k, 'secret') === false)
                 ->mergeRecursive([
                 ]),
             'csrf_token' => csrf_token(),
@@ -40,10 +40,10 @@ class HomeController extends Controller
     {
         $disk = Storage::disk('protected');
         if (! $disk->exists('company_verification_data.json')) {
-            $disk->put('company_verification_data.json', "[]");
+            $disk->put('company_verification_data.json', '[]');
         }
 
-        $data = collect(json_decode($disk->get('company_verification_data.json'), JSON_FORCE_OBJECT))->map(function($data) {
+        $data = collect(json_decode($disk->get('company_verification_data.json'), JSON_FORCE_OBJECT))->map(function ($data) {
             if ($data['type'] === 'file') {
                 $data['preview'] = $data['name'];
             } elseif ($data['type'] === 'checkbox') {
@@ -51,6 +51,7 @@ class HomeController extends Controller
                 $data['highlight'] = true;
                 $data['traditional'] = true;
             }
+
             return $data;
         });
 
@@ -68,11 +69,12 @@ class HomeController extends Controller
                 'data.*.file_type' => 'File #:position Type',
             ]);
 
-            $data = collect($request->data)->map(function($data) {
+            $data = collect($request->data)->map(function ($data) {
                 $data['name'] = str($data['label'])->slug('_')->toString();
                 if ($data['type'] === 'file') {
                     $data['accept'] = $this->file_types[$data['file_type']];
                 }
+
                 return $data;
             })->toJson(JSON_PRETTY_PRINT);
             $disk->put('company_verification_data.json', $data);

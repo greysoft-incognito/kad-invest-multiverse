@@ -6,10 +6,10 @@ use App\Traits\Meta;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Collection;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\ServiceProvider;
 use PDO;
 
 defined('DB_VERSION') || define('DB_VERSION', str($dbv = request()->header('db-version'))->prepend($dbv ? 'v' : null)->toString());

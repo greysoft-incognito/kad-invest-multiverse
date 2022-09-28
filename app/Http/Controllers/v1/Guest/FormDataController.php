@@ -57,13 +57,13 @@ class FormDataController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, $form_id)
+    public function store(Request $request, $form_id, $dontProcess = false)
     {
         $form = Form::whereId($form_id)->orWhere('slug', $form_id)->firstOrFail();
 
         $errors = collect([]);
 
-        $custom_messages = $form->fields->filter(fn($f)=>$f->custom_error)->mapWithKeys(function($field, $key) {
+        $custom_messages = $form->fields->filter(fn ($f) => $f->custom_error)->mapWithKeys(function ($field, $key) {
             if ($field->required_if) {
                 return ["data.$field->name.required_if" => $field->custom_error];
             } elseif ($field->required) {
@@ -71,11 +71,11 @@ class FormDataController extends Controller
             }
         })->toArray();
 
-        $custom_attributes = $form->fields->mapWithKeys(function($field, $key) {
+        $custom_attributes = $form->fields->mapWithKeys(function ($field, $key) {
             return ['data.'.$field->name => $field->label];
         })->toArray();
 
-        $validation_rules = $form->fields->mapWithKeys(function($field, $key) {
+        $validation_rules = $form->fields->mapWithKeys(function ($field, $key) {
             if ($field->type === 'number') {
                 $rules[] = 'numeric';
             } elseif ($field->type === 'multiple') {
@@ -86,7 +86,7 @@ class FormDataController extends Controller
             if ($field->required_if) {
                 $rules[] = 'nullable';
                 foreach (explode(',', $field->required_if) as $k => $r) {
-                    $rules[] = 'required_if:data.'. str($r)->replace('=',',');
+                    $rules[] = 'required_if:data.'.str($r)->replace('=', ',');
                 }
             } elseif ($field->required) {
                 $rules[] = 'required';
@@ -101,7 +101,7 @@ class FormDataController extends Controller
                     $rules[] = "min:$field->min";
                 }
                 if ($field->max) {
-                    $rules[] = "min:$field->max";
+                    $rules[] = "max:$field->max";
                 }
             }
 
@@ -111,6 +111,7 @@ class FormDataController extends Controller
             if ($field->options) {
                 $rules[] = 'in:'.collect($field->options)->pluck('value')->implode(',');
             }
+
             return ['data.'.$field->name => $rules];
         })->toArray();
 
@@ -119,7 +120,6 @@ class FormDataController extends Controller
                 $errors->push([$key => "$key is not a valid input."]);
             }
             if ($form->fields->pluck('name')->contains($key)) {
-
                 $field = $form->fields->firstWhere('name', $key);
 
                 if ($field->required && $field->type === 'date' && $field->compare) {
@@ -131,18 +131,18 @@ class FormDataController extends Controller
                     $diff = $date->diffInYears($compare);
 
                     if ($field->min && $diff < $field->min) {
-                        $errors->push(['data.'.$key => __("The minimum :1 requirement for this application is :0, your :2 puts you at :3 by :4.", [$field->max, $field->alias, $field->label, $diff, $compare])]);
+                        $errors->push(['data.'.$key => __('The minimum :1 requirement for this application is :0, your :2 puts you at :3 by :4.', [$field->max, $field->alias, $field->label, $diff, $compare])]);
                     }
 
                     if ($field->max && $diff > $field->max) {
-                        $errors->push(['data.'.$key => __("The :1 limit for this application is :0, your :2 puts you at :3 by :4.", [$field->max, $field->alias, $field->label, $diff, $compare])]);
+                        $errors->push(['data.'.$key => __('The :1 limit for this application is :0, your :2 puts you at :3 by :4.', [$field->max, $field->alias, $field->label, $diff, $compare])]);
                     }
                 }
 
                 if ($field->key) {
                 }
                 if ($field->key && GenericFormData::whereJsonContains("data->{$key}", $value)->exists()) {
-                    $errors->push(['data.'.$key => __("The :0 has already been taken.", [$field->label])]);
+                    $errors->push(['data.'.$key => __('The :0 has already been taken.', [$field->label])]);
                 }
             }
         }
@@ -160,11 +160,17 @@ class FormDataController extends Controller
         $key = $form->fields->firstWhere('key', true)->name ?? $form->fields->first()->name;
         $data = $request->get('data');
 
-        if (!$data) {
+        if (! $data) {
             throw ValidationException::withMessages(['data' => 'No data passed']);
         }
+
+        if ($dontProcess === true) {
+            return $data;
+        }
+
         $formdata = GenericFormData::create([
             'form_id' => $form_id,
+            'user_id' => $request->user_id ?? null,
             'data' => $data,
             'key' => $data[$key] ?? '',
         ]);
