@@ -23,8 +23,8 @@ class Kernel extends ConsoleKernel
         ->mondays()
         ->at('00:00');
 
-        $schedule->command(ExportFormData::class)
-        ->everyMinute();
+        // $schedule->command(ExportFormData::class)
+        // ->everyMinute();
 
         $schedule->command(ExportFormData::class)
             ->weekly()
