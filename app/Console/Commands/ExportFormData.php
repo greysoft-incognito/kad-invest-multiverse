@@ -82,7 +82,7 @@ class ExportFormData extends Command
                 $value = collect($field->options)->where('value', $value)->first()['label'] ?? $value;
             }
 
-            return [$label => $value];
+            return [$label => is_array($value) ? implode(', ', $value) : $value];
         });
     }
 
