@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Console\Commands\ExportFormData;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -16,6 +17,19 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
+
+        $schedule->command(ExportFormData::class)
+        ->weekly()
+        ->mondays()
+        ->at('00:00');
+
+        $schedule->command(ExportFormData::class)
+        ->everyMinute();
+
+        $schedule->command(ExportFormData::class)
+            ->weekly()
+            ->fridays()
+            ->at('12:00');
     }
 
     /**

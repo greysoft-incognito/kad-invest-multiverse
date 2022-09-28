@@ -2,10 +2,10 @@
 
 namespace App\Models\v1;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Reservation extends Model
@@ -84,11 +84,12 @@ class Reservation extends Model
     public function status(): Attribute
     {
         return new Attribute(
-            get: function() {
+            get: function () {
                 $user = $this->user_type === 'guest' ? $this->guest : $this->user;
                 $transaction = $user ? $this->transactions()->whereUserId($user->id)->latest()->first() : null;
+
                 return $transaction
-                    ? ($transaction->status === 'pending' || $transaction->status === 'paid' ? 'reserved'  : $transaction->status)
+                    ? ($transaction->status === 'pending' || $transaction->status === 'paid' ? 'reserved' : $transaction->status)
                     : 'pending';
             },
         );
@@ -97,8 +98,9 @@ class Reservation extends Model
     public function transaction(): Attribute
     {
         return new Attribute(
-            get: function() {
+            get: function () {
                 $user = $this->user_type === 'guest' ? $this->guest : $this->user;
+
                 return $user ? $this->transactions()->whereUserId($user->id)->latest()->first() : null;
             },
         );

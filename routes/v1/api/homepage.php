@@ -1,12 +1,12 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\v1\Guest\FormController;
 use App\Http\Controllers\v1\Guest\FormDataController;
 use App\Http\Controllers\v1\Guest\FormFieldController;
 use App\Http\Controllers\v1\HomeController;
 use App\Http\Controllers\v1\ReservationController;
 use App\Http\Controllers\v1\SpacesController;
+use Illuminate\Support\Facades\Route;
 
 Route::name('home.')->group(function () {
     Route::get('/', function () {

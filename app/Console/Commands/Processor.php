@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Models\v1\Space;
 use App\Models\v1\Transaction;
 use Illuminate\Console\Command;
 
@@ -39,6 +38,7 @@ class Processor extends Command
             });
 
         $this->info('Automated processes completed successfully!');
+
         return 0;
     }
 }

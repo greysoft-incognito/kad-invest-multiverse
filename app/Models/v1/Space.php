@@ -136,7 +136,6 @@ class Space extends Model
      */
     public function reservedDates(): Attribute
     {
-
         return new Attribute(
             get: (function () {
                 $dates = [];

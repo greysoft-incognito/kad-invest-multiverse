@@ -10,8 +10,6 @@ use App\Models\v1\Form;
 use App\Models\v1\GenericFormData;
 use App\Services\HttpStatus;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
 
 class FormDataController extends Controller
 {
@@ -60,6 +58,7 @@ class FormDataController extends Controller
     public function store(Request $request, $form_id)
     {
         \Gate::authorize('usable', 'formdata.create');
+
         return (new GuestFormDataController)->store($request, $form_id);
     }
 
@@ -132,17 +131,17 @@ class FormDataController extends Controller
         \Gate::authorize('usable', 'formdata.stats');
 
         if ($request->data) {
-          	$request_data = str($request->data)->explode(',');
-            $data = $request_data->mapWithKeys(function($value) use ($form, $request_data) {
+            $request_data = str($request->data)->explode(',');
+            $data = $request_data->mapWithKeys(function ($value) use ($form, $request_data) {
                 $stat = str($value)->explode(':');
 
-                $key = is_numeric($stat[1]??$stat[0]) || is_bool($stat[1]??$stat[0])
+                $key = is_numeric($stat[1] ?? $stat[0]) || is_bool($stat[1] ?? $stat[0])
                     ? $stat[0]
-                    : $stat[1]??$stat[0];
+                    : $stat[1] ?? $stat[0];
 
-                $values = str($stat[1]??'')->explode('.');
+                $values = str($stat[1] ?? '')->explode('.');
 
-                if (str($stat[1]??'')->contains('.')) {
+                if (str($stat[1] ?? '')->contains('.')) {
                     $stat[2] = $values->get(1);
                     $stat[3] = $values->get(2);
                 }
@@ -150,12 +149,11 @@ class FormDataController extends Controller
                 $stat[1] = $values->get(0);
 
                 $query = $form->data();
-                if ( isset($stat[3]) ) {
+                if (isset($stat[3])) {
                     $query->whereJsonContains("data->{$stat[0]}", [$stat[1], $stat[2], $stat[3]]);
-                } elseif ( isset($stat[2]) ) {
+                } elseif (isset($stat[2])) {
                     $query->whereJsonContains("data->{$stat[0]}", [$stat[1], $stat[2]]);
-                } elseif ( $stat[1] ) {
-
+                } elseif ($stat[1]) {
                     $field = $form->fields()->where('name', $stat[0])->first();
 
                     if ($field && $field->type === 'multiple') {
@@ -165,9 +163,9 @@ class FormDataController extends Controller
                         $query->whereJsonDoesntContain("data->{$stat[0]}", [$stat[1]]);
                     }
 
-                  	$others = $request_data->filter(fn($rd)=> $rd !== "{$stat[0]}:{$stat[1]}")->toArray();
-                    foreach($others as $other) {
-                      $query->whereJsonDoesntContain("data->{$stat[0]}", str_ireplace("{$stat[0]}:", '', $other));
+                    $others = $request_data->filter(fn ($rd) => $rd !== "{$stat[0]}:{$stat[1]}")->toArray();
+                    foreach ($others as $other) {
+                        $query->whereJsonDoesntContain("data->{$stat[0]}", str_ireplace("{$stat[0]}:", '', $other));
                     }
                 }
 

@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\v1\Space;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Schema;
 
@@ -26,7 +25,7 @@ class SpaceSeeder extends Seeder
                 $spaces[] = [
                     'name' => $letter.$range,
                     'size' => '0',
-                    'info' => 'About this space: ' . $letter . $range,
+                    'info' => 'About this space: '.$letter.$range,
                     'price' => 0,
                     'data' => json_encode(['color' => $colors[$k]]),
                 ];
@@ -35,6 +34,5 @@ class SpaceSeeder extends Seeder
 
         Space::insert($spaces);
         Schema::enableForeignKeyConstraints();
-
     }
 }

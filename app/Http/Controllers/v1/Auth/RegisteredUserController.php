@@ -49,8 +49,8 @@ class RegisteredUserController extends Controller
         $name = Str::of($request->name ?? $request->username)->explode(' ');
 
         $user = User::create([
-            'firstname' => ($firstname = $name->first(fn ($k) =>$k !== null, $request->name)),
-            'lastname' => $name->last(fn ($k) =>$k !== $firstname, ''),
+            'firstname' => ($firstname = $name->first(fn ($k) => $k !== null, $request->name)),
+            'lastname' => $name->last(fn ($k) => $k !== $firstname, ''),
             'email' => $request->email,
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
@@ -73,21 +73,25 @@ class RegisteredUserController extends Controller
         $user->save();
     }
 
-    public function preflight($token)
+    public function preflight($token, $responseData = [], $gaurd = null, $user = null)
     {
         [$id, $user_token] = explode('|', $token, 2);
         $token_data = DB::table('personal_access_tokens')->where('token', hash('sha256', $user_token))->first();
         $user_id = $token_data->tokenable_id;
 
-        Auth::loginUsingId($user_id);
-        $user = Auth::user();
-        $user->subscription;
+        if ($user) {
+            Auth::login($user);
+        } else {
+            Auth::loginUsingId($user_id);
+            $user = Auth::guard($gaurd)->user();
+            $user->subscription;
+        }
 
-        return (new UserResource(Auth::user()))->additional([
+        return (new UserResource($user))->additional(array_merge([
             'message' => 'Registration was successfull',
             'status' => 'success',
             'status_code' => HttpStatus::CREATED,
             'token' => $token,
-        ])->response()->setStatusCode(HttpStatus::CREATED);
+        ], $responseData))->response()->setStatusCode(HttpStatus::CREATED);
     }
 }

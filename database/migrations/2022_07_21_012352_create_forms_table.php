@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('forms', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('portal_id')->nullable()->constrained('portals', 'id')->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('name')->nullable();
             $table->string('slug')->nullable();
             $table->string('title')->nullable();
@@ -25,6 +26,8 @@ return new class extends Migration
             $table->text('banner_info')->fullText()->nullable();
             $table->json('socials')->nullable();
             $table->timestamp('deadline')->nullable();
+            $table->boolean('dont_notify')->default(false);
+            $table->text('data_emails')->nullable();
             $table->string('template')->default('default');
             $table->timestamps();
         });

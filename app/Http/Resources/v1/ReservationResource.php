@@ -47,7 +47,7 @@ class ReservationResource extends JsonResource
                 'paid' => 'Paid',
                 'time_left' => 'Time Left (Hours)',
                 'date' => 'Reservation Date',
-            ])->map(function($value, $key) {
+            ])->map(function ($value, $key) {
                 return [
                     'id' => $key,
                     'name' => $key,
