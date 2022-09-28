@@ -2,12 +2,14 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\SendReport;
 use App\Mail\ReportGenerated;
 use App\Models\v1\Form;
 use App\Models\v1\GenericFormData;
 use App\Services\GenericDataExport;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\RateLimiter;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ExportFormData extends Command
@@ -23,7 +25,7 @@ class ExportFormData extends Command
      *
      * @var string
      */
-    protected $signature = 'export:formdata';
+    protected $signature = 'export:formdata {--Q|queue}';
 
     /**
      * The console command description.
@@ -39,15 +41,17 @@ class ExportFormData extends Command
      */
     public function handle()
     {
-        $this->export();
+        $queue = $this->option('queue');
+
+        $this->export($queue);
 
         return 0;
     }
 
-    public function export()
+    public function export($queue = false)
     {
         $this->info('Exporting form data...');
-        Form::where('data_emails', '!=', null)->get()->each(function ($form) {
+        Form::where('data_emails', '!=', null)->get()->each(function ($form) use ($queue) {
             $this->form = $form;
             GenericFormData::query()->chunk(300, function ($items, $sheets) {
                 $this->info('Exporting chunk of '.$items->count().' items to sheets '.$sheets.'...');
@@ -63,7 +67,7 @@ class ExportFormData extends Command
                 $this->items = [];
             });
 
-            $this->exportItems($this->sheets, $this->form);
+            $this->exportItems($this->sheets, $queue);
             $this->info('Done!');
         });
     }
@@ -87,11 +91,22 @@ class ExportFormData extends Command
         $this->items[] = $item;
     }
 
-    public function exportItems($items)
+    public function exportItems($items, $queue = false)
     {
-        $this->form->data_emails->each(function ($email) {
-            Mail::to($email->toString())->send(new ReportGenerated($this->form));
-        });
+        if ($queue === true) {
+            SendReport::dispatch($this->form);
+        } else {
+            $this->form->data_emails->each(function ($email) {
+                RateLimiter::attempt(
+                    'send-report:'.$email,
+                    1,
+                    function() use ($email) {
+                        Mail::to($email->toString())->send(new ReportGenerated($this->report));
+                    },
+                    5
+                );
+            });
+        }
 
         return Excel::store(new GenericDataExport($items), 'exports/'.($this->form->id ?? '').'/data.xlsx', 'protected');
     }
