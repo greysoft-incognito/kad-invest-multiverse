@@ -19,7 +19,8 @@
         "matomo/device-detector": "^6.0",
         "psr/simple-cache": "^2.0",
         "simplesoftwareio/simple-qrcode": "^4.2",
-        "toneflix-code/laravel-fileable": "^1.0"
+        "toneflix-code/laravel-fileable": "^1.0",
+        "yabacon/paystack-php": "^2.2"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

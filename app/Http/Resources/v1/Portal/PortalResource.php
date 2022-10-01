@@ -24,6 +24,7 @@ class PortalResource extends JsonResource
             'meta' => $this->meta,
             'allow_registration' => $this->allow_registration,
             'reg_link_title' => $this->reg_link_title,
+            'reg_fee' => $this->reg_fee,
             'reg_form_id' => $this->reg_form_id,
             'login_link_title' => $this->login_link_title,
             'logo' => $this->images['logo'],

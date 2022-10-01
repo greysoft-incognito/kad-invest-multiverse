@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\v1\PaymentController;
 use App\Http\Controllers\v1\Admin\ReservationController;
 use App\Http\Controllers\v1\Manage\FormController as SuFormController;
 use App\Http\Controllers\v1\Manage\FormDataController as SuFormDataController;
@@ -52,6 +53,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('form-data/stats/{form}', [SuFormDataController::class, 'stats'])->name('stats');
         Route::apiResource('form-data/{form}', SuFormDataController::class)->parameters(['{form}' => 'id']);
     });
+
+    Route::name('payment.')->prefix('payment')->controller(PaymentController::class)->group(function () {
+        Route::post('/initialize', 'store')->name('initialize');
+        Route::get('/paystack/verify/{type?}', 'paystackVerify')->name('payment.paystack.verify');
+        Route::delete('/terminate', 'destroy')->name('terminate');
+    });
+
+    Route::get('transactions/{status?}', [TransactionController::class, 'index'])->name('index');
+    Route::get('transactions/{reference}/invoice', [TransactionController::class, 'invoice'])->name('invoice');
+    Route::apiResource('transactions', TransactionControlle::class)->except('index');
 
     Route::get('/playground', function () {
         return (new Shout())->viewable();
