@@ -6,6 +6,7 @@ use App\Http\Controllers\v1\Manage\FormController as SuFormController;
 use App\Http\Controllers\v1\Manage\FormDataController as SuFormDataController;
 use App\Http\Controllers\v1\Manage\FormFieldController as SuFormFieldController;
 use App\Http\Controllers\v1\ScanHistoryController;
+use App\Http\Controllers\v1\TransactionController;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
@@ -40,6 +41,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('scan-history', [ScanHistoryController::class, 'index'])->name('scan-history');
         // schow scan history
         Route::get('scan-history/{scan}', [ScanHistoryController::class, 'show'])->name('scan-history.show');
+
+        Route::get('transactions/{status?}', [TransactionController::class, 'index'])->name('transactions.index');
+        Route::get('transactions/{reference}/invoice', [TransactionController::class, 'invoice'])->name('transactions.invoice');
+        Route::apiResource('transactions', TransactionController::class)->except('index');
     });
 
     Route::name('manage.')->prefix('manage')->group(function () {
@@ -59,10 +64,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/paystack/verify/{type?}', 'paystackVerify')->name('payment.paystack.verify');
         Route::delete('/terminate', 'destroy')->name('terminate');
     });
-
-    Route::get('transactions/{status?}', [TransactionController::class, 'index'])->name('index');
-    Route::get('transactions/{reference}/invoice', [TransactionController::class, 'invoice'])->name('invoice');
-    Route::apiResource('transactions', TransactionControlle::class)->except('index');
 
     Route::get('/playground', function () {
         return (new Shout())->viewable();

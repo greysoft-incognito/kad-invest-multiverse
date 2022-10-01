@@ -7,6 +7,7 @@ use App\Http\Resources\v1\User\TransactionCollection;
 use App\Models\v1\Transaction as Transaction;
 use App\Services\HttpStatus;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
 {
