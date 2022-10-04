@@ -60,6 +60,16 @@ class Portal extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
+    public function learning_paths(): MorphMany
+    {
+        return $this->morphMany(LearningPath::class, 'learnable');
+    }
+
+    /**
+     * Get all of the pages for the Portal
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function pages(): HasMany
     {
         return $this->hasMany(PortalPage::class);

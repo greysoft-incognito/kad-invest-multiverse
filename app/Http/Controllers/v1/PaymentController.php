@@ -39,6 +39,7 @@ class PaymentController extends Controller
         $this->validate($request, [
             'type' => ['required', 'string'],
             'portal_id' => ['required_if:type,portal'],
+            'learning_path' => ['nullable, exists:learning_paths,id'],
             'items' => ['required_if:type,cart_checkout', 'array'],
         ]);
 
@@ -52,13 +53,20 @@ class PaymentController extends Controller
                 $portal = Portal::findOrFail($request->portal_id);
                 $transactions = $portal->transactions();
 
+                if ($request->learning_path && $portal->reg_form->learning_paths) {
+                    $learning_path = $portal->reg_form->learning_paths->learningPaths()->findOrFail($request->learning_path);
+                    $reg_fee = $learning_path->price;
+                } else {
+                    $reg_fee = $portal->reg_fee;
+                }
+
                 $due = $request->installment === 1
-                    ? $portal->reg_fee
+                    ? $reg_fee
                     : ($request->installment === (1/2)
-                        ? $portal->reg_fee / 2
+                        ? $reg_fee / 2
                         : ($request->installment === (1/3)
-                            ? $portal->reg_fee / 3
-                            : $portal->reg_fee / 4
+                            ? $reg_fee / 3
+                            : $reg_fee / 4
                         )
                     );
 
@@ -70,9 +78,10 @@ class PaymentController extends Controller
                     'amount' => $due,
                     'due' => $due,
                     'data' => [
+                        'learning_path' => $request->learning_path ?? null,
                         'installment' => $request->installment,
-                        'total' => $portal->reg_fee,
-                        'signature' => MD5($portal->reg_fee.$user->email.time()),
+                        'total' => $reg_fee,
+                        'signature' => MD5($reg_fee.$user->email.time()),
                     ],
                 ]);
             }
