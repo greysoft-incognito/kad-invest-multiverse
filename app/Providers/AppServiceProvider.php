@@ -57,6 +57,6 @@ class AppServiceProvider extends ServiceProvider
             // your exception handling logic
         }
 
-        dd(Storage::disk('google')->get('22-09-22--17-00-05.sql'));
+        // dd(Storage::disk('google')->get('22-09-22--17-00-05.sql'));
     }
 }
