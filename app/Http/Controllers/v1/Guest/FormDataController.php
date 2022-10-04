@@ -63,6 +63,18 @@ class FormDataController extends Controller
 
         $errors = collect([]);
 
+        $form->fields = $form->fields->map(function ($field) use ($form) {
+            if ($field->alias === 'learning_paths' && !!$form->learning_paths) {
+                $field->options = collect($form->learning_paths)->map(function($path) {
+                    $path->label = $path->title;
+                    $path->value = $path->id;
+                    return $path;
+                });
+            }
+
+            return $field;
+        });
+
         $custom_messages = $form->fields->filter(fn ($f) => $f->custom_error)->mapWithKeys(function ($field, $key) {
             if ($field->required_if) {
                 return ["data.$field->name.required_if" => $field->custom_error];
@@ -214,3 +226,4 @@ class FormDataController extends Controller
         //
     }
 }
+

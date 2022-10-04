@@ -39,7 +39,7 @@ class PaymentController extends Controller
         $this->validate($request, [
             'type' => ['required', 'string'],
             'portal_id' => ['required_if:type,portal'],
-            'learning_path' => ['nullable, exists:learning_paths,id'],
+            'learning_path' => ['nullable', 'exists:learning_paths,id'],
             'items' => ['required_if:type,cart_checkout', 'array'],
         ]);
 
@@ -54,13 +54,13 @@ class PaymentController extends Controller
                 $transactions = $portal->transactions();
 
                 if ($request->learning_path && $portal->reg_form->learning_paths) {
-                    $learning_path = $portal->reg_form->learning_paths->learningPaths()->findOrFail($request->learning_path);
+                    $learning_path = $portal->reg_form->learning_paths()->findOrFail($request->learning_path);
                     $reg_fee = $learning_path->price;
                 } else {
                     $reg_fee = $portal->reg_fee;
                 }
 
-                $due = $request->installment === 1
+                $due = ceil($request->installment === 1
                     ? $reg_fee
                     : ($request->installment === (1/2)
                         ? $reg_fee / 2
@@ -68,7 +68,7 @@ class PaymentController extends Controller
                             ? $reg_fee / 3
                             : $reg_fee / 4
                         )
-                    );
+                    ));
 
                 $transactions->create([
                     'user_id' => Auth::id(),
