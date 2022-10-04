@@ -32,9 +32,18 @@ class FormResource extends JsonResource
             'socials' => $this->socials,
             'deadline' => $this->deadline,
             'infos' => $this->infos,
-            'fields' => $this->fields,
+            'fields' => collect($this->fields)->map(function($field) {
+                if ($field->alias === 'learning_paths' && !!$this->learning_paths) {
+                    $field->options = collect($this->learning_paths)->map(function($path) {
+                        $path->label = $path->title;
+                        $path->value = $path->id;
+                        return $path;
+                    });
+                }
+                return $field;
+            }),
             'learning_paths' => $this->when(
-                $this->learning_paths && ! $request->route()->named('home.forms.index'),
+                !!$this->learning_paths && ! $request->route()->named('home.forms.index'),
                 new LearningPathCollection($this->learning_paths)),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

@@ -40,6 +40,7 @@ class PortalResource extends JsonResource
             'navbar_pages' => $this->navbar_pages,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'learning_paths' => $this->when($this->reg_form->learning_paths??null, new LearningPathCollection($this->reg_form->learning_paths??null)),
             'reg_form' => $this->when($request->route()->named('portals.show') && $this->reg_form, new FormResource($this->reg_form)),
         ];
     }

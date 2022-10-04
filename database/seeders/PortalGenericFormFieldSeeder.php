@@ -106,7 +106,7 @@ class PortalGenericFormFieldSeeder extends Seeder
                     [
                         'form_id' => $form->id,
                         'label' => 'Select Course',
-                        'alias' => null,
+                        'alias' => 'learning_paths',
                         'name' => 'course',
                         'field_id' => 'course',
                         'element' => 'select',

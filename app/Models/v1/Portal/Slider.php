@@ -11,19 +11,15 @@ class Slider extends Model
 {
     use HasFactory, Fileable;
 
+    protected $casts = [
+        'link' => 'array',
+        'list' => 'array',
+    ];
+
     public function registerFileable()
     {
         $this->fileableLoader([
-            'image1' => 'banner',
-            'image2' => 'banner',
-            'image3' => 'banner',
-            'image4' => 'banner',
-            'image5' => 'banner',
-            'image6' => 'banner',
-            'image7' => 'banner',
-            'image8' => 'banner',
-            'image9' => 'banner',
-            'image10' => 'banner',
+            'image' => 'banner'
         ]);
     }
 
