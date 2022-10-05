@@ -64,10 +64,11 @@ class FormDataController extends Controller
         $errors = collect([]);
 
         $form->fields = $form->fields->map(function ($field) use ($form) {
-            if ($field->alias === 'learning_paths' && !!$form->learning_paths) {
-                $field->options = collect($form->learning_paths)->map(function($path) {
+            if ($field->alias === 'learning_paths' && (bool) $form->learning_paths) {
+                $field->options = collect($form->learning_paths)->map(function ($path) {
                     $path->label = $path->title;
                     $path->value = $path->id;
+
                     return $path;
                 });
             }
@@ -226,4 +227,3 @@ class FormDataController extends Controller
         //
     }
 }
-

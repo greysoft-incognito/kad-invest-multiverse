@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\v1\Form;
 use App\Models\v1\Portal\LearningPath;
 use App\Models\v1\Portal\Portal;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class LearningPathSeeder extends Seeder

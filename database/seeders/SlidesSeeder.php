@@ -49,7 +49,7 @@ class SlidesSeeder extends Seeder
                     'link' => ['title' => 'Join The Hotcake Community', 'url' => 'https://t.me/+CEhAxL_QHaU3MGJk', 'target' => '_blank', 'type' => 'primary'],
                     'list' => [
                         'Wow, so @gami had an interview?',
-                        'Abeg give us gist'
+                        'Abeg give us gist',
                     ],
                     'component' => '',
                 ]),
@@ -63,7 +63,7 @@ class SlidesSeeder extends Seeder
                     'list' => [
                         'lol, Yes i did ooo.',
                         '... and it was awesome😀',
-                        'Honestly guys i am glad to be part of the HOTCAKE community'
+                        'Honestly guys i am glad to be part of the HOTCAKE community',
                     ],
                     'component' => '',
                 ]),
@@ -77,7 +77,7 @@ class SlidesSeeder extends Seeder
                     'list' => [
                         'Omoh @gami just finished her course last week.',
                         '...and she’s bagged a job in no time',
-                        'Sweet!!!'
+                        'Sweet!!!',
                     ],
                     'component' => '',
                 ]),
@@ -90,7 +90,7 @@ class SlidesSeeder extends Seeder
                     'link' => ['title' => 'Join The Hotcake Community', 'url' => 'https://t.me/+CEhAxL_QHaU3MGJk', 'target' => '_blank', 'type' => 'primary'],
                     'list' => [
                         'There’s a reason we are called the HOTCAKES 😀',
-                        'Na them dey rush us'
+                        'Na them dey rush us',
                     ],
                     'component' => '',
                 ]),

@@ -19,7 +19,7 @@ class Slider extends Model
     public function registerFileable()
     {
         $this->fileableLoader([
-            'image' => 'banner'
+            'image' => 'banner',
         ]);
     }
 

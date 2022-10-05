@@ -100,7 +100,7 @@ class ExportFormData extends Command
                 RateLimiter::attempt(
                     'send-report:'.$email,
                     1,
-                    function() use ($email) {
+                    function () use ($email) {
                         Mail::to($email->toString())->send(new ReportGenerated($this->form));
                     },
                     5

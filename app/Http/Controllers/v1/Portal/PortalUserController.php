@@ -17,7 +17,6 @@ use App\Services\HttpStatus;
 use DeviceDetector\DeviceDetector;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class PortalUserController extends Controller
 {

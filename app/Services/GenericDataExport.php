@@ -2,17 +2,17 @@
 
 namespace App\Services;
 
+use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Maatwebsite\Excel\Concerns\WithProperties;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use Maatwebsite\Excel\Concerns\Exportable;
 
 class GenericDataExport implements WithMultipleSheets, ShouldAutoSize, WithProperties, WithStyles
 {
     use Exportable;
-    
+
     public function __construct(array $data, bool $form = null)
     {
         $this->data = $data;

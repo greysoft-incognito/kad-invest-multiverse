@@ -5,7 +5,6 @@ namespace App\Jobs;
 use App\Mail\ReportGenerated;
 use App\Models\v1\Form;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -40,7 +39,7 @@ class SendReport implements ShouldQueue
             RateLimiter::attempt(
                 'send-report:'.$email,
                 1,
-                function() use ($email) {
+                function () use ($email) {
                     Mail::to($email->toString())->send(new ReportGenerated($this->report));
                 },
                 5
