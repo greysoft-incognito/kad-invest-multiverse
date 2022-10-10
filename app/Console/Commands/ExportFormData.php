@@ -53,7 +53,7 @@ class ExportFormData extends Command
         $this->info('Exporting form data...');
         $formData = Form::where('data_emails', '!=', null)->get()->map(function ($form) use ($queue) {
             $this->form = $form;
-            $form->data()->chunk(300, function ($items, $sheets) {
+            $form->data()->chunk(1000, function ($items, $sheets) {
                 $this->info('Exporting chunk of '.$items->count().' items to sheets '.$sheets.'...');
 
                 $this->pushItem($this->parseItem($items->first())->keys()->toArray());
