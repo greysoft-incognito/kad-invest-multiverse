@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\v1\Portal\LearningPath;
 use Illuminate\Database\Seeder;
 
 class PortalDatabaseSeeder extends Seeder

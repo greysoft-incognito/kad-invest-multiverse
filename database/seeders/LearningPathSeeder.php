@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\v1\Form;
 use App\Models\v1\Portal\LearningPath;
 use App\Models\v1\Portal\Portal;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class LearningPathSeeder extends Seeder
@@ -26,6 +25,7 @@ class LearningPathSeeder extends Seeder
                     'description' => 'Product Design',
                     'subtitle' => 'Product Design',
                     'title' => 'Product Design',
+                    'slug' => str('Product Design')->slug(),
                     'image' => asset('images/pe/design.png'),
                     'video' => '',
                     'background' => '',
@@ -39,6 +39,7 @@ class LearningPathSeeder extends Seeder
                     'description' => 'Frontend Engineering',
                     'subtitle' => 'Frontend Engineering',
                     'title' => 'Frontend Engineering',
+                    'slug' => str('Frontend Engineering')->slug(),
                     'image' => asset('images/pe/frontend.png'),
                     'video' => '',
                     'background' => '',
@@ -52,6 +53,7 @@ class LearningPathSeeder extends Seeder
                     'description' => 'Backend Engineering',
                     'subtitle' => 'Backend Engineering',
                     'title' => 'Backend Engineering',
+                    'slug' => str('Backend Engineering')->slug(),
                     'image' => asset('images/pe/backend.png'),
                     'video' => '',
                     'background' => '',
@@ -65,6 +67,7 @@ class LearningPathSeeder extends Seeder
                     'description' => 'Data Science',
                     'subtitle' => 'Data Science',
                     'title' => 'Data Science',
+                    'slug' => str('Data Science')->slug(),
                     'image' => asset('images/pe/data.png'),
                     'video' => '',
                     'background' => '',
@@ -78,6 +81,7 @@ class LearningPathSeeder extends Seeder
                     'description' => 'Digital Marketing',
                     'subtitle' => 'Digital Marketing',
                     'title' => 'Digital Marketing',
+                    'slug' => str('Digital Marketing')->slug(),
                     'image' => asset('images/pe/digital.png'),
                     'video' => '',
                     'background' => '',
@@ -91,6 +95,7 @@ class LearningPathSeeder extends Seeder
                     'description' => 'Blockchan Technology',
                     'subtitle' => 'Blockchan Technology',
                     'title' => 'Blockchan Technology',
+                    'slug' => str('Blockchan Technology')->slug(),
                     'image' => asset('images/pe/blockchain.png'),
                     'video' => '',
                     'background' => '',

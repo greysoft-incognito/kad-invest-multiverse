@@ -20,8 +20,10 @@ class SlidersResource extends JsonResource
             'title' => $this->title,
             'subtitle' => $this->subtitle,
             'content' => $this->content,
-            'images' => $this->images,
+            'image' => $this->images['image'],
             'component' => $this->component,
+            'link' => $this->link,
+            'list' => $this->list,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\v1\Portal\Admin;
+namespace App\Http\Controllers\v1\Admin\Portal;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class CardController extends Controller
+class SectionController extends Controller
 {
     /**
      * Display a listing of the resource.

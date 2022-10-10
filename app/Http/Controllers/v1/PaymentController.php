@@ -39,7 +39,7 @@ class PaymentController extends Controller
         $this->validate($request, [
             'type' => ['required', 'string'],
             'portal_id' => ['required_if:type,portal'],
-            'learning_path' => ['nullable, exists:learning_paths,id'],
+            'learning_path' => ['nullable', 'exists:learning_paths,id'],
             'items' => ['required_if:type,cart_checkout', 'array'],
         ]);
 
@@ -54,21 +54,21 @@ class PaymentController extends Controller
                 $transactions = $portal->transactions();
 
                 if ($request->learning_path && $portal->reg_form->learning_paths) {
-                    $learning_path = $portal->reg_form->learning_paths->learningPaths()->findOrFail($request->learning_path);
+                    $learning_path = $portal->reg_form->learning_paths()->findOrFail($request->learning_path);
                     $reg_fee = $learning_path->price;
                 } else {
                     $reg_fee = $portal->reg_fee;
                 }
 
-                $due = $request->installment === 1
+                $due = ceil($request->installment === 1
                     ? $reg_fee
-                    : ($request->installment === (1/2)
+                    : ($request->installment === (1 / 2)
                         ? $reg_fee / 2
-                        : ($request->installment === (1/3)
+                        : ($request->installment === (1 / 3)
                             ? $reg_fee / 3
                             : $reg_fee / 4
                         )
-                    );
+                    ));
 
                 $transactions->create([
                     'user_id' => Auth::id(),
@@ -81,7 +81,7 @@ class PaymentController extends Controller
                         'learning_path' => $request->learning_path ?? null,
                         'installment' => $request->installment,
                         'total' => $reg_fee,
-                        'signature' => MD5($reg_fee.$user->email.time()),
+                        'signature' => md5($reg_fee.$user->email.time()),
                     ],
                 ]);
             }
@@ -227,5 +227,30 @@ class PaymentController extends Controller
             'type' => $type,
             $type => $transactable,
         ]), $status_info ? ['status_info' => $status_info] : null);
+    }
+
+    /**
+     * Delete a transaction and related models
+     * The most appropriate place to use this is when a user cancels a transaction without
+     * completing payments, although there are limitless use cases.
+     *
+     * @param  Request  $request
+     * @return void
+     */
+    public function terminateTransaction(Request $request)
+    {
+        $deleted = false;
+        if ($transaction = Transaction::whereReference($request->reference)->where('user_id', Auth::id())->first()) {
+            $transaction->delete();
+            $deleted = true;
+        }
+
+        return $this->buildResponse([
+            'message' => $deleted
+                ? "Transaction with reference: {$request->reference} successfully deleted."
+                : 'Transaction not found',
+            'status' => ! $deleted ? 'info' : 'success',
+            'response_code' => 200,
+        ]);
     }
 }

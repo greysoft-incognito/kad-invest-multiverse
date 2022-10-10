@@ -10,8 +10,8 @@ return [
     |
     */
     'site_name' => 'Grey Multiverse',
-    'currency_symbol' => '$',
-    'currency' => 'USD',
+    'currency_symbol' => '₦',
+    'currency' => 'NGN',
     'use_queue' => true,
     'prefered_notification_channels' => ['mail'],
     'keep_successful_queue_logs' => true,
