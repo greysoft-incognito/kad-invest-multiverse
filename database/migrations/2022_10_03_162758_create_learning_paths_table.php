@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->morphs('learnable');
             $table->string('title')->nullable();
+            $table->string('slug')->nullable();
             $table->string('subtitle')->nullable();
             $table->text('description')->fulltext()->nullable();
             $table->string('image')->nullable();

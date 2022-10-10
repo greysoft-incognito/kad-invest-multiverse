@@ -1,11 +1,11 @@
 <?php
 
-use App\Http\Controllers\v1\Portal\Admin\BlogController as AdminBlogController;
-use App\Http\Controllers\v1\Portal\Admin\CardController;
-use App\Http\Controllers\v1\Portal\Admin\PortalController as AdminPortalController;
-use App\Http\Controllers\v1\Portal\Admin\PortalPageController as AdminPortalPageController;
-use App\Http\Controllers\v1\Portal\Admin\SectionController;
-use App\Http\Controllers\v1\Portal\Admin\SlidersController;
+use App\Http\Controllers\v1\Admin\Portal\BlogController as AdminBlogController;
+use App\Http\Controllers\v1\Admin\Portal\CardController;
+use App\Http\Controllers\v1\Admin\Portal\PortalController as AdminPortalController;
+use App\Http\Controllers\v1\Admin\Portal\PortalPageController as AdminPortalPageController;
+use App\Http\Controllers\v1\Admin\Portal\SectionController;
+use App\Http\Controllers\v1\Admin\Portal\SlidersController;
 use App\Http\Controllers\v1\Portal\BlogController;
 use App\Http\Controllers\v1\Portal\PortalController;
 use App\Http\Controllers\v1\Portal\PortalPageController;
@@ -31,7 +31,7 @@ Route::name('portals.')->prefix('portals/{portal}')->group(function () {
     Route::apiResource('/pages', PortalPageController::class)->only(['index', 'show']);
     Route::apiResource('/learning/paths', LearningPath::class, ['as' => 's'])->only(['index', 'show']);
 
-    Route::controller(PortalUserController::class)->group(function() {
+    Route::controller(PortalUserController::class)->group(function () {
         Route::post('/register', 'register')->name('register');
         Route::post('/login', 'login')->name('login');
         Route::get('/user', 'show')->name('user.show')->middleware('auth:sanctum');

@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources\v1\User;
 
-use App\Http\Resources\v1\Business\CompanyResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class TransactionResource extends JsonResource
@@ -38,7 +37,7 @@ class TransactionResource extends JsonResource
             'status' => $this->status,
             'created_at' => $this->created_at,
             'date' => $this->created_at ? $this->created_at->format('d M, Y h:i A') : 'N/A',
-            'user' => $this->when(!$request->route()->named('user.transactions.index'), new UserResource($user)),
+            'user' => $this->when(! $request->route()->named('user.transactions.index'), new UserResource($user)),
         ];
     }
 }

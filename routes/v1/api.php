@@ -1,10 +1,10 @@
 <?php
 
-use App\Http\Controllers\v1\PaymentController;
 use App\Http\Controllers\v1\Admin\ReservationController;
 use App\Http\Controllers\v1\Manage\FormController as SuFormController;
 use App\Http\Controllers\v1\Manage\FormDataController as SuFormDataController;
 use App\Http\Controllers\v1\Manage\FormFieldController as SuFormFieldController;
+use App\Http\Controllers\v1\PaymentController;
 use App\Http\Controllers\v1\ScanHistoryController;
 use App\Http\Controllers\v1\TransactionController;
 use Illuminate\Support\Facades\Broadcast;
@@ -62,7 +62,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::name('payment.')->prefix('payment')->controller(PaymentController::class)->group(function () {
         Route::post('/initialize', 'store')->name('initialize');
         Route::get('/paystack/verify/{type?}', 'paystackVerify')->name('payment.paystack.verify');
-        Route::delete('/terminate', 'destroy')->name('terminate');
+        Route::delete('/terminate', 'terminateTransaction')->name('terminate');
     });
 
     Route::get('/playground', function () {

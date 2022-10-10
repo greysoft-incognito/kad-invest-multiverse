@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\v1\Guest;
+use App\Models\v1\User;
+
 return [
 
     /*
@@ -66,12 +69,12 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\v1\User::class,
+            'model' => User::class,
         ],
 
         'guests' => [
             'driver' => 'eloquent',
-            'model' => App\Models\v1\Guest::class,
+            'model' => Guest::class,
         ],
     ],
 
