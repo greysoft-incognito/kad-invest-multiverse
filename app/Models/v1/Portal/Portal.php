@@ -3,11 +3,13 @@
 namespace App\Models\v1\Portal;
 
 use App\Models\v1\Form;
+use App\Models\v1\Transaction;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use ToneflixCode\LaravelFileable\Traits\Fileable;
 
 class Portal extends Model
@@ -58,6 +60,16 @@ class Portal extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
+    public function learning_paths(): MorphMany
+    {
+        return $this->morphMany(LearningPath::class, 'learnable');
+    }
+
+    /**
+     * Get all of the pages for the Portal
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function pages(): HasMany
     {
         return $this->hasMany(PortalPage::class);
@@ -81,6 +93,16 @@ class Portal extends Model
     public function reg_form(): HasOne
     {
         return $this->hasOne(Form::class, 'portal_id', 'id')->where('id', $this->reg_form_id ?? '---');
+    }
+
+    /**
+     * Get all of the transactions for the Company
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function transactions(): MorphMany
+    {
+        return $this->morphMany(Transaction::class, 'transactable');
     }
 
     public function footerGroups(): Attribute

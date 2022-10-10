@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\v1;
 
+use App\Http\Resources\v1\Portal\LearningPathCollection;
 use App\Services\AppInfo;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -32,6 +33,11 @@ class FormResource extends JsonResource
             'deadline' => $this->deadline,
             'infos' => $this->infos,
             'fields' => $this->fields,
+            'learning_paths' => $this->when(
+                $this->learning_paths && ! $request->route()->named('home.forms.index'),
+                new LearningPathCollection($this->learning_paths)),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 

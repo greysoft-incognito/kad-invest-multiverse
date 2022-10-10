@@ -10,6 +10,7 @@ use App\Http\Controllers\v1\Portal\BlogController;
 use App\Http\Controllers\v1\Portal\PortalController;
 use App\Http\Controllers\v1\Portal\PortalPageController;
 use App\Http\Controllers\v1\Portal\PortalUserController;
+use App\Models\v1\Portal\LearningPath;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'admin'])->name('admin.')->prefix('admin')->group(function () {
@@ -28,6 +29,7 @@ Route::name('portals.')->prefix('portals/{portal}')->group(function () {
     Route::apiResource('/blogs', BlogController::class)->only(['index', 'show']);
     Route::get('/pages/index', [PortalPageController::class, 'showIndex'])->name('pages.show.index');
     Route::apiResource('/pages', PortalPageController::class)->only(['index', 'show']);
+    Route::apiResource('/learning/paths', LearningPath::class, ['as' => 's'])->only(['index', 'show']);
 
     Route::controller(PortalUserController::class)->group(function() {
         Route::post('/register', 'register')->name('register');

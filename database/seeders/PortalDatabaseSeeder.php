@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\v1\Portal\LearningPath;
 use Illuminate\Database\Seeder;
 
 class PortalDatabaseSeeder extends Seeder
@@ -22,6 +23,7 @@ class PortalDatabaseSeeder extends Seeder
             SlidesSeeder::class,
             PortalFormSeeder::class,
             PortalGenericFormFieldSeeder::class,
+            LearningPathSeeder::class,
         ]);
     }
 }

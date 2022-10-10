@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('registration_model')->nullable();
             $table->string('reg_link_title')->nullable();
             $table->string('reg_form_id')->nullable();
+            $table->double('reg_fee')->default(0.00);
             $table->string('login_link_title')->nullable();
             $table->string('phone')->nullable();
             $table->string('email')->nullable();

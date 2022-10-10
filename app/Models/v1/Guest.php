@@ -96,8 +96,8 @@ class Guest extends Authenticatable
     /**
      * Get all of the guest's TRANSACTIONS.
      */
-    public function transactions(): MorphMany
+    public function transactions(): HasMany
     {
-        return $this->morphMany(Transaction::class, 'transactable');
+        return $this->hasMany(Transaction::class, 'user_id');
     }
 }

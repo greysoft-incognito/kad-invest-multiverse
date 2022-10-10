@@ -2,10 +2,12 @@
 
 namespace App\Models\v1;
 
+use App\Models\v1\Portal\LearningPath;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use ToneflixCode\LaravelFileable\Traits\Fileable;
 
 class Form extends Model
@@ -101,6 +103,16 @@ class Form extends Model
     public function infos(): HasMany
     {
         return $this->hasMany(FormInfo::class)->orderBy('priority');
+    }
+
+    /**
+     * Get all of the pages for the Portal
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function learning_paths(): MorphMany
+    {
+        return $this->morphMany(LearningPath::class, 'learnable');
     }
 
     /**
