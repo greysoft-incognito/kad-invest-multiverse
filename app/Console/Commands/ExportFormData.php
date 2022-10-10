@@ -51,9 +51,9 @@ class ExportFormData extends Command
     public function export($queue = false)
     {
         $this->info('Exporting form data...');
-        Form::where('data_emails', '!=', null)->get()->each(function ($form) use ($queue) {
+        $formData = Form::where('data_emails', '!=', null)->get()->map(function ($form) use ($queue) {
             $this->form = $form;
-            GenericFormData::query()->chunk(300, function ($items, $sheets) {
+            $form->data()->chunk(300, function ($items, $sheets) {
                 $this->info('Exporting chunk of '.$items->count().' items to sheets '.$sheets.'...');
 
                 $this->pushItem($this->parseItem($items->first())->keys()->toArray());
@@ -67,7 +67,7 @@ class ExportFormData extends Command
                 $this->items = [];
             });
 
-            $this->exportItems($this->sheets, $queue);
+            $this->exportItems($this->sheets, $queue, $this->form);
             $this->info('Done!');
         });
     }
@@ -91,8 +91,12 @@ class ExportFormData extends Command
         $this->items[] = $item;
     }
 
-    public function exportItems($items, $queue = false)
+    public function exportItems($items, $queue = false, $form = null)
     {
+        if (!is_array($items) || empty($items)) {
+            return false;
+        }
+
         if ($queue === true) {
             SendReport::dispatch($this->form);
         } else {
@@ -108,6 +112,6 @@ class ExportFormData extends Command
             });
         }
 
-        return Excel::store(new GenericDataExport($items), 'exports/'.($this->form->id ?? '').'/data.xlsx', 'protected');
+        return Excel::store(new GenericDataExport($items), 'exports/'.($form->id ?? $this->form->id ?? '').'/data.xlsx', 'protected');
     }
 }
