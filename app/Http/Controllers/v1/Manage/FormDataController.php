@@ -22,9 +22,10 @@ class FormDataController extends Controller
     public function index(Request $request, Form $form)
     {
         \Gate::authorize('usable', 'formdata.list');
-        $forms = $form->data()->paginate($request->get('limit', 30))->withQueryString();
+        $data = $form->data()->paginate($request->get('limit', 30))->withQueryString();
 
-        return (new FormDataCollection($forms))->additional([
+        return (new FormDataCollection($data))->additional([
+            'form' => $form,
             'message' => HttpStatus::message(HttpStatus::OK),
             'status' => 'success',
             'status_code' => HttpStatus::OK,
