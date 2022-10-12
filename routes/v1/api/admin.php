@@ -3,6 +3,7 @@
 use App\Http\Controllers\v1\Admin\AdminController;
 use App\Http\Controllers\v1\Admin\ReservationController;
 use App\Http\Controllers\v1\Admin\SpacesController;
+use App\Http\Controllers\v1\Admin\TransactionController;
 use App\Http\Controllers\v1\Manage\FormController as SuFormController;
 use App\Http\Controllers\v1\Manage\FormDataController as SuFormDataController;
 use App\Http\Controllers\v1\Manage\FormFieldController as SuFormFieldController;
@@ -22,6 +23,8 @@ Route::middleware(['auth:sanctum', 'admin'])->name('admin.')->prefix('admin')->g
             Route::put('/{reservation}/status', 'status')->name('status');
         });
     });
+
+    Route::apiResource('/transactions', TransactionController::class);
 
     Route::apiResource('forms', SuFormController::class);
     Route::apiResource('form-infos/{form}', FormInfoController::class)->parameter('{form}', 'info');
