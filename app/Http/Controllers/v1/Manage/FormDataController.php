@@ -75,6 +75,12 @@ class FormDataController extends Controller
         $data = GenericFormData::whereId($id)->orWhere('key', $id)->firstOrFail();
 
         return (new FormDataResource($data))->additional([
+            'form' => [
+                'id' => $form_id,
+                'name' => $data->form->name,
+                'title' => $data->form->title,
+                'slug' => $data->form->slug,
+            ],
             'message' => HttpStatus::message(HttpStatus::OK),
             'status' => 'success',
             'status_code' => HttpStatus::OK,
