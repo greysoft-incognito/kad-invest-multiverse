@@ -25,7 +25,12 @@ class FormDataController extends Controller
         $data = $form->data()->paginate($request->get('limit', 30))->withQueryString();
 
         return (new FormDataCollection($data))->additional([
-            'form' => $form,
+            'form' => [
+                'id' => $form->id,
+                'name' => $form->name,
+                'title' => $form->title,
+                'slug' => $form->slug,
+            ],
             'message' => HttpStatus::message(HttpStatus::OK),
             'status' => 'success',
             'status_code' => HttpStatus::OK,
