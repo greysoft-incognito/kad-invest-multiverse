@@ -23,9 +23,10 @@ class SendReport implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(Form $report)
+    public function __construct(Form $report, $batch = null)
     {
         $this->report = $report;
+        $this->batch = $batch;
     }
 
     /**
@@ -38,9 +39,9 @@ class SendReport implements ShouldQueue
         $this->report->data_emails->each(function ($email) {
             RateLimiter::attempt(
                 'send-report:'.$email,
-                1,
+                5,
                 function () use ($email) {
-                    Mail::to($email->toString())->send(new ReportGenerated($this->report));
+                    Mail::to($email->toString())->send(new ReportGenerated($this->report, $this->batch));
                 },
                 5
             );
