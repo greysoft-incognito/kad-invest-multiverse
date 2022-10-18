@@ -38,7 +38,7 @@ class SendReport implements ShouldQueue
     {
         $this->report->data_emails->each(function ($email) {
             RateLimiter::attempt(
-                'send-report:'.$email,
+                'send-report:'.$email.$this->batch,
                 5,
                 function () use ($email) {
                     Mail::to($email->toString())->send(new ReportGenerated($this->report, $this->batch));
