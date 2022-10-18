@@ -71,7 +71,7 @@ class GenericFormData extends Model
                 $name = collect([
                     $this->data[$fname_field->name ?? '--'] ?? '',
                     $this->data[$lname_field->name ?? '--'] ?? '',
-                    ! $fname_field && ! $lname_field ? $this->data[$fullname_field->name ?? '--'] : '',
+                    ! $fname_field && ! $lname_field ? ($this->data[$fullname_field->name ?? '--'] ?? '') : '',
                 ])->filter(fn ($name) => $name !== '')->implode(' ');
                 return $name;
             },
