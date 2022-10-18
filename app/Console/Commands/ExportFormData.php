@@ -85,7 +85,7 @@ class ExportFormData extends Command
                 $this->items = [];
             });
 
-            $title = $scanned ? $form->name . '(Scanned data)' : $form->name;
+            $title = $scanned ? $form->name . ' (Scanned data)' : $form->name;
             $this->exportItems($this->sheets, $queue, $form, $title);
             $this->sheets = [];
             $this->batch = 0;
