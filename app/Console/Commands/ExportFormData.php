@@ -66,8 +66,8 @@ class ExportFormData extends Command
         $formData = $query->where('data_emails', '!=', null)->get()->map(function ($form) use ($queue, $scanned) {
             $this->form = $form;
             $this->batch++;
-            $form->data()->chunk(1000, function ($items, $sheets) use ($form) {
-                $this->info('Exporting chunk of '.$items->count().' items to sheets '.$sheets.' of ' . $form->name . '...');
+            $form->data()->chunk(1000, function ($items, $sheets) {
+                $this->info('Exporting chunk of '.$items->count().' items to sheets '.$sheets.' of ' . $this->form->name . '...');
 
                 $this->pushItem($this->parseItem($items->first())->keys()->toArray());
                 $items->each(function ($item) {
@@ -77,11 +77,12 @@ class ExportFormData extends Command
                 });
 
                 $this->sheets[] = $this->items;
+                $this->items = [];
             });
 
             $title = $scanned ? $form->name . '(Scanned data)' : $form->name;
             $this->exportItems($this->sheets, $queue, $form, $title);
-            $this->items = [];
+            $this->sheets = [];
             $this->info('Done!');
         });
     }
@@ -107,29 +108,27 @@ class ExportFormData extends Command
 
     public function exportItems($items, $queue = false, $form = null, $title = null)
     {
-        $form = $form ?? $this->form;
-
         if (!is_array($items) || empty($items)) {
             return false;
         }
 
         if ($queue === true) {
-            SendReport::dispatch($form, $this->batch);
+            SendReport::dispatch($this->form, $this->batch);
         } else {
-            $form->data_emails->each(function ($email) use ($form) {
+            $this->form->data_emails->each(function ($email)  {
                 RateLimiter::attempt(
                     'send-report:'.$email,
                     5,
-                    function () use ($email, $form) {
-                        Mail::to($email->toString())->send(new ReportGenerated($form, $this->batch));
+                    function () use ($email) {
+                        Mail::to($email->toString())->send(new ReportGenerated($this->form, $this->batch));
                     },
                 );
             });
         }
 
         return Excel::store(
-            new GenericDataExport($items, $form, $title),
-            'exports/' . ($form->id ?? $form->id ?? 'form') . '/data-batch' . $this->batch . '.xlsx',
+            new GenericDataExport($items, $this->form, $title),
+            'exports/' . ($this->form->id ?? $this->form->id ?? 'form') . '/data-batch' . $this->batch . '.xlsx',
             'protected'
         );
     }
