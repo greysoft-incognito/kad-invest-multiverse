@@ -2,6 +2,7 @@
 
 namespace App\Models\v1;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -53,6 +54,28 @@ class GenericFormData extends Model
     public function form(): BelongsTo
     {
         return $this->belongsTo(Form::class);
+    }
+
+    /**
+     * Get the name of user from the GenericFormData field
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    public function nameAttribute(): Attribute
+    {
+        return new Attribute(
+            get: function () {
+                $fname_field = $this->form->fields()->fname()->first();
+                $lname_field = $this->form->fields()->lname()->first();
+                $fullname_field = $this->form->fields()->fullname()->first();
+                $name = collect([
+                    $this->data[$fname_field->name ?? '--'] ?? '',
+                    $this->data[$lname_field->name ?? '--'] ?? '',
+                    ! $fname_field && ! $lname_field ? $this->data[$fullname_field->name ?? '--'] : '',
+                ])->filter(fn ($name) => $name !== '')->implode(' ');
+                return $name;
+            },
+        );
     }
 
     /**

@@ -44,21 +44,32 @@ class ExportFormData extends Command
         $queue = $this->option('queue');
 
         $this->export($queue);
+        $this->export($queue, true);
 
         return 0;
     }
 
-    public function export($queue = false)
+    public function export($queue = false, $scanned = false)
     {
-        $this->info('Exporting form data...');
-        $formData = Form::where('data_emails', '!=', null)->get()->map(function ($form) use ($queue) {
+        $query = Form::query();
+
+        if ($scanned === true) {
+            $query->whereHas('data', function($q) {
+                $q->whereHas('scans');
+            });
+            $this->info('Exporting scanned form data...');
+        } else {
+            $this->info('Exporting form data...');
+        }
+
+        $formData = $query->where('data_emails', '!=', null)->get()->map(function ($form) use ($queue, $scanned) {
             $this->form = $form;
             $form->data()->chunk(1000, function ($items, $sheets) {
-                $this->info('Exporting chunk of '.$items->count().' items to sheets '.$sheets.'...');
+                $this->info('Exporting chunk of '.$items->count().' items to sheets '.$sheets.' of ' . $this->form->name . '...');
 
                 $this->pushItem($this->parseItem($items->first())->keys()->toArray());
                 $items->each(function ($item) {
-                    $this->info('Exporting item '.$item->id.'...');
+                    $this->info('Exporting item '.$item->id.' ('.$item->name_attribute.')...');
                     $item = $this->parseItem($item)->toArray();
                     $this->pushItem($item);
                 });
@@ -67,7 +78,8 @@ class ExportFormData extends Command
                 $this->items = [];
             });
 
-            $this->exportItems($this->sheets, $queue, $this->form);
+            $title = $scanned ? $this->form->name . '(Scanned data)' : $this->form->name;
+            $this->exportItems($this->sheets, $queue, $this->form, $title);
             $this->info('Done!');
         });
     }
@@ -91,7 +103,7 @@ class ExportFormData extends Command
         $this->items[] = $item;
     }
 
-    public function exportItems($items, $queue = false, $form = null)
+    public function exportItems($items, $queue = false, $form = null, $title = null)
     {
         if (!is_array($items) || empty($items)) {
             return false;
@@ -107,11 +119,14 @@ class ExportFormData extends Command
                     function () use ($email) {
                         Mail::to($email->toString())->send(new ReportGenerated($this->form));
                     },
-                    5
                 );
             });
         }
 
-        return Excel::store(new GenericDataExport($items), 'exports/'.($form->id ?? $this->form->id ?? '').'/data.xlsx', 'protected');
+        return Excel::store(
+            new GenericDataExport($items, $this->form, $title),
+            'exports/'.($form->id ?? $this->form->id ?? '').'/data.xlsx',
+            'protected'
+        );
     }
 }
