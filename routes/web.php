@@ -50,7 +50,7 @@ Route::get('/{type}/data/qr/{id}', function ($type, $id) {
     Response::make($qr)->header('Content-Type', 'image/png')->send();
 })->name('form.data.qr');
 
-Route::get('download/formdata/{timestamp}/{form}', function ($timestamp, $data) {
+Route::get('download/formdata/{timestamp}/{form}/{batch?}', function ($timestamp, $data, $batch = null) {
     // Auth::logout();
     $setTime = Carbon::createFromTimestamp($timestamp);
     if ($setTime->diffInSeconds(now()) > 36000) {
@@ -61,7 +61,7 @@ Route::get('download/formdata/{timestamp}/{form}', function ($timestamp, $data) 
     $form = Form::findOrFail($id);
     $storage = Storage::disk('protected');
 
-    $path = 'exports/'.$form->id.'/data.xlsx';
+    $path = 'exports/' . $form->id . '/data-batch'. $batch . '.xlsx';
 
     if ($storage->exists($path)) {
         $mime = $storage->mimeType($path);
