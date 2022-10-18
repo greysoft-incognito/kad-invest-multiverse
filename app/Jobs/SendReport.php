@@ -23,10 +23,11 @@ class SendReport implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(Form $report, $batch = null)
+    public function __construct(Form $report, $batch = null, $title = null)
     {
         $this->report = $report;
         $this->batch = $batch;
+        $this->title = $title;
     }
 
     /**
@@ -41,9 +42,9 @@ class SendReport implements ShouldQueue
                 'send-report:'.$email.$this->batch,
                 5,
                 function () use ($email) {
-                    Mail::to($email->toString())->send(new ReportGenerated($this->report, $this->batch));
+                    Mail::to($email->toString())->send(new ReportGenerated($this->report, $this->batch, $this->title));
                 },
-                5
+                30
             );
         });
     }
