@@ -142,4 +142,13 @@ class GenericFormData extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function scopeScanned($query, $scanned = true)
+    {
+        if ($scanned) {
+            return $query->whereHas('scans');
+        } else {
+            return $query->whereDoesntHave('scans');
+        }
+    }
 }
