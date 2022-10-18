@@ -19,6 +19,7 @@ class ExportFormData extends Command
     protected $sheets = [];
 
     protected $form;
+    protected $batch = 0;
 
     /**
      * The name and signature of the console command.
@@ -64,6 +65,7 @@ class ExportFormData extends Command
 
         $formData = $query->where('data_emails', '!=', null)->get()->map(function ($form) use ($queue, $scanned) {
             $this->form = $form;
+            $this->batch++;
             $form->data()->chunk(1000, function ($items, $sheets) {
                 $this->info('Exporting chunk of '.$items->count().' items to sheets '.$sheets.' of ' . $this->form->name . '...');
 
@@ -117,7 +119,7 @@ class ExportFormData extends Command
                     'send-report:'.$email,
                     1,
                     function () use ($email) {
-                        Mail::to($email->toString())->send(new ReportGenerated($this->form));
+                        Mail::to($email->toString())->send(new ReportGenerated($this->form, $this->batch));
                     },
                 );
             });
@@ -125,7 +127,7 @@ class ExportFormData extends Command
 
         return Excel::store(
             new GenericDataExport($items, $this->form, $title),
-            'exports/'.($form->id ?? $this->form->id ?? '').'/data.xlsx',
+            'exports/' . ($form->id ?? $this->form->id ?? 'form') . '/data-batch' . $this->batch . '.xlsx',
             'protected'
         );
     }
