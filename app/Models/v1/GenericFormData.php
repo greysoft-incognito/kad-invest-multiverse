@@ -68,10 +68,11 @@ class GenericFormData extends Model
                 $fname_field = $this->form->fields()->fname()->first();
                 $lname_field = $this->form->fields()->lname()->first();
                 $fullname_field = $this->form->fields()->fullname()->first();
+                $email_field = $this->form->fields()->email()->first();
                 $name = collect([
                     $this->data[$fname_field->name ?? '--'] ?? '',
                     $this->data[$lname_field->name ?? '--'] ?? '',
-                    ! $fname_field && ! $lname_field ? ($this->data[$fullname_field->name ?? '--'] ?? '') : '',
+                    ! $fname_field && ! $lname_field ? ($this->data[$fullname_field->name ?? $email_field->name ?? '--'] ?? '') : '',
                 ])->filter(fn ($name) => $name !== '')->implode(' ');
                 return $name;
             },
