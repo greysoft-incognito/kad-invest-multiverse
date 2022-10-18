@@ -112,12 +112,12 @@ class ExportFormData extends Command
         }
 
         if ($queue === true) {
-            SendReport::dispatch($this->form);
+            SendReport::dispatch($this->form, $this->batch);
         } else {
             $this->form->data_emails->each(function ($email) {
                 RateLimiter::attempt(
                     'send-report:'.$email,
-                    1,
+                    5,
                     function () use ($email) {
                         Mail::to($email->toString())->send(new ReportGenerated($this->form, $this->batch));
                     },
