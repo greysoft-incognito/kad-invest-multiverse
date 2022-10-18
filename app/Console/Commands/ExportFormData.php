@@ -63,9 +63,9 @@ class ExportFormData extends Command
             $this->info('Exporting form data...');
         }
 
+        $this->batch++;
         $formData = $query->where('data_emails', '!=', null)->get()->map(function ($form) use ($queue, $scanned) {
             $this->form = $form;
-            $this->batch++;
             $form->data()->chunk(1000, function ($items, $sheets) {
                 $this->info('Exporting chunk of '.$items->count().' items to sheets '.$sheets.' of ' . $this->form->name . '...');
 
