@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\v1\Form;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
@@ -13,10 +14,11 @@ class GenericDataExport implements WithMultipleSheets, ShouldAutoSize, WithPrope
 {
     use Exportable;
 
-    public function __construct(array $data, bool $form = null)
+    public function __construct(array $data, Form $form = null, $title = null)
     {
         $this->data = $data;
         $this->form = $form;
+        $this->title = $title;
     }
 
     /**
@@ -45,8 +47,8 @@ class GenericDataExport implements WithMultipleSheets, ShouldAutoSize, WithPrope
         return [
             'creator' => 'GreyMultiverese',
             'lastModifiedBy' => $this->form->name ?? 'GreyMultiverse',
-            'title' => ($this->form->name ?? 'GreyMultiverse').' Submited Data',
-            'description' => $this->form->title ?? 'Submited Data',
+            'title' => ($this->title ? $this->title  : ($this->form->name ?? 'GreyMultiverse')).' Submited Data',
+            'description' => $this->form->title ?? $this->title ?? 'Submited Data',
             'keywords' => 'submissions,export,spreadsheet,greysoft,greymultiverse,'.($this->form->name ?? 'good'),
             'category' => 'Submited Data',
             'company' => $this->form->name ?? 'GreyMultiverse',
